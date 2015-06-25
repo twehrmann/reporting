@@ -1,4 +1,4 @@
-setwd("/Volumes/SSD2go_tw/conafor/R Client/cliente_delta_carbon")
+setwd("/Volumes/SSD2go_tw/conafor/reporting/cliente_delta_carbon")
 DEBUG=TRUE
 
 

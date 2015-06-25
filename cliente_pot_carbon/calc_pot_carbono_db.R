@@ -1,5 +1,5 @@
 
-setwd("/Volumes/SSD2go_tw/conafor/R Client/cliente_pot_carbon")
+setwd("/Volumes/SSD2go_tw/conafor/reporting/cliente_pot_carbon")
 source("tools.R")
 source("db_access.R")
 source("calc_FE.R")

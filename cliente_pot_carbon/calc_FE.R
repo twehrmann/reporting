@@ -36,7 +36,7 @@ calcFE <- function(fe_variable_gui, lcc_type_gui, inputData) {
   ###############################################################################
   ####Se filtran los estratos que no pertenencen a las categor?as de "Tierras"###
   ######################## Forestales" o "Praderas" del IPCC#####################
-  BaseT1=BaseT1[BaseT1$[,ESTRATOS_IPCC]=="Tierras Forestales" | BaseT1$[,ESTRATOS_IPCC]=="Praderas",]
+  BaseT1=BaseT1[BaseT1[,ESTRATOS_IPCC]=="Tierras Forestales" | BaseT1[,ESTRATOS_IPCC]=="Praderas",]
   length(BaseT1$folio)
   
   #se filtra todas las USM cuya "tipificaci?n" es "Inicial", "Reemplazo" o "Monitoreo"
@@ -60,13 +60,10 @@ calcFE <- function(fe_variable_gui, lcc_type_gui, inputData) {
   FE_VAR=fe_variable_gui
   
   all_vars = getAllVariables(BaseT1)
-
+  
   print (fe_variable_gui %in% names(all_vars))
   if (! (fe_variable_gui %in% names(all_vars))) {
-    df <- data.frame(Date=as.Date(character()),
-                     File=character(), 
-                     User=character(), 
-                     stringsAsFactors=FALSE) 
+    df <- data.frame(test=character()) 
     
     return(new("ResultSet",
                result=df,
@@ -74,11 +71,11 @@ calcFE <- function(fe_variable_gui, lcc_type_gui, inputData) {
                variable=FE_VAR,
                status=FALSE))
   }
-
- 
+  
+  
   fe_variable=BaseT1[,FE_VAR]
   #Se imputan los 0 en los conglomerdos reportados "Monitoreo" y que ten?an "Pradera"
-  BaseT1$FEvar<-ifelse(BaseT1$tipificacion=="Monitoreo" & BaseT1$[,ESTRATOS_IPCC]=="Praderas",0,
+  BaseT1$FEvar<-ifelse(BaseT1$tipificacion=="Monitoreo" & BaseT1[,ESTRATOS_IPCC]=="Praderas",0,
                        as.numeric(as.character(fe_variable)))
   
   #Se filtran todos los "NA" de la variable "CarbAerViv"
@@ -98,7 +95,7 @@ calcFE <- function(fe_variable_gui, lcc_type_gui, inputData) {
   
   #Estrato
   Estrato<-BaseT1[,ESTRATO_KEY]
-  AreasEstratos<-data.frame(Estrato=AreasEstratos$cves,AreaHa=AreasEstratos$[,AREAS_ESTRATOS_KEY])
+  AreasEstratos<-data.frame(Estrato=AreasEstratos$cves,AreaHa=AreasEstratos[,AREAS_ESTRATOS_KEY])
   
   #Conglomerado
   Conglomerado<-BaseT1$folio
