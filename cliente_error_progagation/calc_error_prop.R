@@ -37,7 +37,7 @@ calcErrorProp <- function(inputData) {
   BaseTransiS2S3<-0
   BaseTransiS2S3<-summaryBy(temp_env$BaseCruces$Count ~ temp_env$BaseCruces$S2_S3_p,
                             data=temp_env$BaseCruces, FUN=FunSum,keep.names=TRUE, var.names=c("Areas"))
-  length(BaseTransiS2S3$S2_S3_p)
+  loginfo(length(BaseTransiS2S3$S2_S3_p))
   rm(temp_env,envir=.GlobalEnv) # cleanup 
   
   #Se identifica el tipo de din?mica en cada estrato de tratsici?n entre S2 y S3
@@ -57,15 +57,15 @@ calcErrorProp <- function(inputData) {
                                                                                            ifelse(BaseDinamicaDep$DinamicaG=="NA","NA","NO APLICA"))))))))))
   #Se asigna el tipo de din?mica a cada transici?n 
   BaseTransiS2S3<- merge(BaseTransiS2S3, BaseDinamicaDep, by.x = "S2_S3_p", by.y = "S2_S3",all=TRUE)
-  length(BaseTransiS2S3$S2_S3_p)
+  loginfo(length(BaseTransiS2S3$S2_S3_p))
   
   #se filtran los NULL en la variable "Areas"
   BaseTransiS2S3<-BaseTransiS2S3[!(is.na(BaseTransiS2S3$Areas)),]
-  length(BaseTransiS2S3$S2_S3_p)
+  loginfo(length(BaseTransiS2S3$S2_S3_p))
   
   #Se eliminan el estrato "NO APLICA"
   BaseTransiS2S3<-BaseTransiS2S3[BaseTransiS2S3$Dinamica!="NO APLICA",]
-  length(BaseTransiS2S3$S2_S3_p)
+  loginfo-7length(BaseTransiS2S3$S2_S3_p))
   
   DifSeries<-4
   
@@ -170,7 +170,10 @@ calcErrorProp <- function(inputData) {
              TablaFEFA=TablaFEFA,
              BaseTransiS2S3=BaseTransiS2S3,
              module="Estimadores de emission/absorbcion y incertidumbres por clase del IPCC",
-             variable="N/A"))
+             variable="N/A",
+             status=TRUE
+             )
+         )
   
 }
 

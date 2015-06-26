@@ -77,9 +77,9 @@
 		<defaultValueExpression><![CDATA["BUR"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[--select id, title, description, tablename as result, variable from --client_output.fe_pot_summary order by priority
+		<![CDATA[select id, title, description, tablename as result, variable from client_output.fe_pot_strata_summary order by priority
 
-select id, title, description, tablename as result, variable from client_output.fe_delta_summary order by priority]]>
+--select id, title, description, tablename as result, variable from --client_output.fe_delta_strata_summary order by priority]]>
 	</queryString>
 	<field name="id" class="java.lang.Integer"/>
 	<field name="title" class="java.lang.String"/>

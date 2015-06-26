@@ -5,7 +5,8 @@ setClass(Class="ResultSet",
            TablaFEFA="data.frame",
            BaseTransiS2S3="data.frame",
            module="character",
-           variable="character"
+           variable="character",
+           status="logical"
          )
 )
 
