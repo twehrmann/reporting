@@ -139,6 +139,12 @@
 		<field name="EmisionesAbsorciones" class="java.lang.Double"/>
 		<field name="Ui2_Ai2" class="java.lang.Double"/>
 		<field name="U" class="java.lang.Double"/>
+		<variable name="sum_area" class="java.lang.Number" calculation="Sum">
+			<variableExpression><![CDATA[$F{Area}]]></variableExpression>
+		</variable>
+		<variable name="sum_emisione" class="java.lang.Number" calculation="Sum">
+			<variableExpression><![CDATA[$F{EmisionesAbsorciones}]]></variableExpression>
+		</variable>
 	</subDataset>
 	<subDataset name="FEFA_iPCC_BUR" uuid="b2680efe-f61b-4d28-9f6d-749e6abed644">
 		<queryString language="SQL">
@@ -211,67 +217,99 @@ from client_output."FE_dinamica_BUR" --order by "Estrato" asc,"DinEstFE" desc]]>
 						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 					</datasetRun>
 					<jr:column width="90" uuid="54c22943-98d0-455d-b548-57d14b4f4fcb">
-						<jr:tableHeader style="table 3_TH" height="30" rowSpan="1"/>
 						<jr:columnHeader style="table 3_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="30" uuid="d6d61fb6-4441-4934-b0fd-8b96757d7ed8"/>
-								<text><![CDATA[Dinamica]]></text>
+								<text><![CDATA[Dinamica
+nivel IPCC]]></text>
 							</staticText>
 						</jr:columnHeader>
+						<jr:columnFooter height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="efdb816e-7946-4e07-a4c3-e4e0b336cebb"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="14" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Σ]]></text>
+							</staticText>
+						</jr:columnFooter>
 						<jr:detailCell style="table 3_TD" height="20" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="90" height="20" uuid="a1062adc-4ead-4c5d-af3c-5817441c3609"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{Dinamica}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="90" uuid="b8c9c21c-02bb-43da-9b7d-3f3001b88677">
-						<jr:tableHeader style="table 3_TH" height="30" rowSpan="1"/>
 						<jr:columnHeader style="table 3_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="30" uuid="c7bcc277-aa1d-468a-a6e4-f15dc8e0013d"/>
-								<text><![CDATA[Area]]></text>
+								<text><![CDATA[Area
+ha]]></text>
 							</staticText>
 						</jr:columnHeader>
+						<jr:columnFooter height="30" rowSpan="1">
+							<textField pattern="#,##0">
+								<reportElement x="0" y="0" width="90" height="30" uuid="104f20d1-c60b-4bcd-8ff1-035bcc87b025"/>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font isItalic="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{sum_area}]]></textFieldExpression>
+							</textField>
+						</jr:columnFooter>
 						<jr:detailCell style="table 3_TD" height="20" rowSpan="1">
-							<textField>
+							<textField pattern="#,##0">
 								<reportElement x="0" y="0" width="90" height="20" uuid="b1f850a4-e8a0-423c-a2e5-a23ca46a2776"/>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<paragraph rightIndent="3"/>
+								</textElement>
 								<textFieldExpression><![CDATA[$F{Area}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="90" uuid="6b9722c2-40a4-4f84-a92b-0cbd57abf2d7">
-						<jr:tableHeader style="table 3_TH" height="30" rowSpan="1"/>
+					<jr:column width="135" uuid="6b9722c2-40a4-4f84-a92b-0cbd57abf2d7">
 						<jr:columnHeader style="table 3_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="e3713400-50b6-4ddc-a9ce-26a045212fff"/>
+								<reportElement x="0" y="0" width="135" height="30" uuid="e3713400-50b6-4ddc-a9ce-26a045212fff"/>
 								<text><![CDATA[EmisionesAbsorciones]]></text>
 							</staticText>
 						</jr:columnHeader>
+						<jr:columnFooter height="30" rowSpan="1">
+							<textField pattern="#,##0">
+								<reportElement x="0" y="0" width="135" height="30" uuid="7170e370-a498-469b-9565-175e1c061373"/>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font isItalic="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{sum_emisione}]]></textFieldExpression>
+							</textField>
+						</jr:columnFooter>
 						<jr:detailCell style="table 3_TD" height="20" rowSpan="1">
 							<textField>
-								<reportElement x="0" y="0" width="90" height="20" uuid="907cdb2f-19e6-443f-b722-da4dc7cfaa09"/>
+								<reportElement x="0" y="0" width="135" height="20" uuid="907cdb2f-19e6-443f-b722-da4dc7cfaa09"/>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<paragraph rightIndent="3"/>
+								</textElement>
 								<textFieldExpression><![CDATA[$F{EmisionesAbsorciones}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="90" uuid="ef9c3125-956c-4a28-9e1c-3341d4ad2b5c">
-						<jr:tableHeader style="table 3_TH" height="30" rowSpan="1"/>
+					<jr:column width="134" uuid="ef9c3125-956c-4a28-9e1c-3341d4ad2b5c">
 						<jr:columnHeader style="table 3_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="82dd1a8e-c62c-4ea5-becd-17cdb35e761e"/>
+								<reportElement x="0" y="0" width="134" height="30" uuid="82dd1a8e-c62c-4ea5-becd-17cdb35e761e"/>
 								<text><![CDATA[Ui2_Ai2]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="table 3_TD" height="20" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="90" height="20" uuid="24a81330-39d5-4333-82b3-248d414e45b2"/>
+							<textField pattern="#,##0.00">
+								<reportElement x="0" y="0" width="134" height="20" uuid="24a81330-39d5-4333-82b3-248d414e45b2"/>
+								<textElement textAlignment="Right" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{Ui2_Ai2}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="90" uuid="5b2faa03-0eff-49c2-ac21-23b78c78356e">
-						<jr:tableHeader style="table 3_TH" height="30" rowSpan="1"/>
 						<jr:columnHeader style="table 3_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="30" uuid="31cc8f65-4fe9-4f71-80e9-098550c788f8"/>
@@ -279,8 +317,9 @@ from client_output."FE_dinamica_BUR" --order by "Estrato" asc,"DinEstFE" desc]]>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="table 3_TD" height="20" rowSpan="1">
-							<textField>
+							<textField pattern="###0.00">
 								<reportElement x="0" y="0" width="90" height="20" uuid="f05bdb41-2539-4dc7-84ab-4d8dd540a305"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{U}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
@@ -303,16 +342,13 @@ from client_output."FE_dinamica_BUR" --order by "Estrato" asc,"DinEstFE" desc]]>
 						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 					</datasetRun>
 					<jr:column width="90" uuid="7d516221-2427-4c9d-ae6a-adeb577b60fe">
-						<jr:tableHeader style="table 4_TH" height="30"/>
-						<jr:tableFooter style="table 4_TH" height="30"/>
-						<jr:columnHeader style="table 4_CH" height="30">
+						<jr:columnHeader style="table 4_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="30" uuid="4ffda43e-e8c0-4c44-910a-700d4a107b99"/>
 								<text><![CDATA[Estrato]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 4_CH" height="30"/>
-						<jr:detailCell style="table 4_TD" height="20">
+						<jr:detailCell style="table 4_TD" height="20" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="90" height="20" uuid="95441489-9b17-4b46-9f22-6ecfbbb84bb9"/>
 								<textFieldExpression><![CDATA[$F{Estrato}]]></textFieldExpression>
@@ -320,16 +356,13 @@ from client_output."FE_dinamica_BUR" --order by "Estrato" asc,"DinEstFE" desc]]>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="90" uuid="841f7ac5-5ab6-4b3a-b69f-e5c672a8c528">
-						<jr:tableHeader style="table 4_TH" height="30"/>
-						<jr:tableFooter style="table 4_TH" height="30"/>
-						<jr:columnHeader style="table 4_CH" height="30">
+						<jr:columnHeader style="table 4_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="30" uuid="1c4312bf-6bc0-4966-8ccb-fe43aa0b5731"/>
 								<text><![CDATA[FE]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 4_CH" height="30"/>
-						<jr:detailCell style="table 4_TD" height="20">
+						<jr:detailCell style="table 4_TD" height="20" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="90" height="20" uuid="00f25f1e-2290-4b8f-ad3b-9aaeed5227c9"/>
 								<textFieldExpression><![CDATA[$F{FE}]]></textFieldExpression>
@@ -337,35 +370,29 @@ from client_output."FE_dinamica_BUR" --order by "Estrato" asc,"DinEstFE" desc]]>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="90" uuid="ed33f6c2-9bd4-41bf-b212-f5568329e73a">
-						<jr:tableHeader style="table 4_TH" height="30"/>
-						<jr:tableFooter style="table 4_TH" height="30"/>
-						<jr:columnHeader style="table 4_CH" height="30">
+						<jr:columnHeader style="table 4_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="30" uuid="58f7380c-a6b9-4268-9659-2efe302f9b6a"/>
 								<text><![CDATA[U]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 4_CH" height="30"/>
-						<jr:detailCell style="table 4_TD" height="20">
+						<jr:detailCell style="table 4_TD" height="20" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="90" height="20" uuid="3018c08f-4421-4860-87cc-44c8f63b33a5"/>
 								<textFieldExpression><![CDATA[$F{U}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="90" uuid="d6350405-cc1b-42fb-9d71-6abfedff6d9b">
-						<jr:tableHeader style="table 4_TH" height="30"/>
-						<jr:tableFooter style="table 4_TH" height="30"/>
-						<jr:columnHeader style="table 4_CH" height="30">
+					<jr:column width="174" uuid="d6350405-cc1b-42fb-9d71-6abfedff6d9b">
+						<jr:columnHeader style="table 4_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="1be7f543-eb09-4712-8d55-5a4aae4a06c6"/>
+								<reportElement x="0" y="0" width="174" height="30" uuid="1be7f543-eb09-4712-8d55-5a4aae4a06c6"/>
 								<text><![CDATA[DinEstFE]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 4_CH" height="30"/>
-						<jr:detailCell style="table 4_TD" height="20">
+						<jr:detailCell style="table 4_TD" height="20" rowSpan="1">
 							<textField>
-								<reportElement x="0" y="0" width="90" height="20" uuid="3899afc5-a7cd-490d-899e-6bf4aab87e78"/>
+								<reportElement x="0" y="0" width="174" height="20" uuid="3899afc5-a7cd-490d-899e-6bf4aab87e78"/>
 								<textFieldExpression><![CDATA[$F{DinEstFE}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
@@ -395,15 +422,12 @@ from client_output."FE_dinamica_BUR" --order by "Estrato" asc,"DinEstFE" desc]]>
 						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 					</datasetRun>
 					<jr:column width="90" uuid="96aeaca3-7e02-4a59-8c0e-dbff6c99185c">
-						<jr:tableHeader style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:tableFooter style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:columnHeader style="table 5_CH" height="30" rowSpan="1">
+						<jr:columnHeader style="table 5_CH" height="60" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="30" uuid="9727f07b-a092-4dee-ad01-f29301295d63"/>
 								<text><![CDATA[DinEstFE]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 5_CH" height="60" rowSpan="1"/>
 						<jr:detailCell style="table 5_TD" height="30" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="90" height="20" uuid="1cd876b7-30ad-42bd-bd8a-fd12372b0c77"/>
@@ -412,15 +436,12 @@ from client_output."FE_dinamica_BUR" --order by "Estrato" asc,"DinEstFE" desc]]>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="90" uuid="a8068d4e-af84-4816-b18b-66b03562f892">
-						<jr:tableHeader style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:tableFooter style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:columnHeader style="table 5_CH" height="30" rowSpan="1">
+						<jr:columnHeader style="table 5_CH" height="60" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="30" uuid="33a301fa-5ab9-42d6-9251-9db002411bab"/>
 								<text><![CDATA[Areas]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 5_CH" height="60" rowSpan="1"/>
 						<jr:detailCell style="table 5_TD" height="30" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="90" height="20" uuid="2635b0c8-dc89-47b8-916b-6bf451adf82d"/>
@@ -429,120 +450,99 @@ from client_output."FE_dinamica_BUR" --order by "Estrato" asc,"DinEstFE" desc]]>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="90" uuid="00ab23df-de48-476b-9347-1c3959688e26">
-						<jr:tableHeader style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:tableFooter style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:columnHeader style="table 5_CH" height="30" rowSpan="1">
+						<jr:columnHeader style="table 5_CH" height="60" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="90" height="30" uuid="1d147050-b50b-468e-8ac6-e8de31daf05c"/>
 								<text><![CDATA[Dinamica]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 5_CH" height="60" rowSpan="1"/>
 						<jr:detailCell style="table 5_TD" height="30" rowSpan="1">
 							<textField>
-								<reportElement x="0" y="0" width="90" height="20" uuid="d7609bd5-72c4-47db-aebc-aefbef2cecb8"/>
+								<reportElement x="0" y="0" width="90" height="30" uuid="d7609bd5-72c4-47db-aebc-aefbef2cecb8"/>
 								<textFieldExpression><![CDATA[$F{Dinamica}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="90" uuid="f3e23555-b2ee-487f-90cb-5a6e597da4fe">
-						<jr:tableHeader style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:tableFooter style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:columnHeader style="table 5_CH" height="30" rowSpan="1">
+					<jr:column width="50" uuid="f3e23555-b2ee-487f-90cb-5a6e597da4fe">
+						<jr:columnHeader style="table 5_CH" height="60" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="ed5d9c4c-fdac-4c57-9ea1-7bad118e275b"/>
+								<reportElement x="0" y="0" width="50" height="30" uuid="ed5d9c4c-fdac-4c57-9ea1-7bad118e275b"/>
 								<text><![CDATA[Estrato]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 5_CH" height="60" rowSpan="1"/>
 						<jr:detailCell style="table 5_TD" height="30" rowSpan="1">
 							<textField>
-								<reportElement x="0" y="0" width="90" height="20" uuid="9c19b73b-46d1-4471-a1b2-20630f6a2e00"/>
+								<reportElement x="0" y="0" width="50" height="30" uuid="9c19b73b-46d1-4471-a1b2-20630f6a2e00"/>
 								<textFieldExpression><![CDATA[$F{Estrato}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="90" uuid="e9a17b3f-4cc6-4616-9480-e06f02a321ed">
-						<jr:tableHeader style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:tableFooter style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:columnHeader style="table 5_CH" height="30" rowSpan="1">
+					<jr:column width="27" uuid="e9a17b3f-4cc6-4616-9480-e06f02a321ed">
+						<jr:columnHeader style="table 5_CH" height="60" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="7c4f7b95-d54a-49ff-818a-f12abf89fea3"/>
+								<reportElement x="0" y="0" width="27" height="60" uuid="7c4f7b95-d54a-49ff-818a-f12abf89fea3"/>
 								<text><![CDATA[FE]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 5_CH" height="60" rowSpan="1"/>
 						<jr:detailCell style="table 5_TD" height="30" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="90" height="20" uuid="d775f602-5ac4-4179-8e29-075ce7ae94b1"/>
+							<textField pattern="###0">
+								<reportElement x="0" y="0" width="27" height="30" uuid="d775f602-5ac4-4179-8e29-075ce7ae94b1"/>
 								<textFieldExpression><![CDATA[$F{FE}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="90" uuid="ee537241-ef9e-4d90-9a85-3df175fe144c">
-						<jr:tableHeader style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:tableFooter style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:columnHeader style="table 5_CH" height="30" rowSpan="1">
+					<jr:column width="50" uuid="ee537241-ef9e-4d90-9a85-3df175fe144c">
+						<jr:columnHeader style="table 5_CH" height="60" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="09ea872e-0514-482b-8bbd-ee9f4ea685cc"/>
+								<reportElement x="0" y="0" width="50" height="30" uuid="09ea872e-0514-482b-8bbd-ee9f4ea685cc"/>
 								<text><![CDATA[AreasAnualizada]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 5_CH" height="60" rowSpan="1"/>
 						<jr:detailCell style="table 5_TD" height="30" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="90" height="20" uuid="6ef0a45c-1b41-4229-98a4-f33bd75087e2"/>
+							<textField pattern="###0">
+								<reportElement x="0" y="0" width="50" height="30" uuid="6ef0a45c-1b41-4229-98a4-f33bd75087e2"/>
 								<textFieldExpression><![CDATA[$F{AreasAnualizada}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="90" uuid="5e3b2126-a416-47d9-9546-96ff53d132b9">
-						<jr:tableHeader style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:tableFooter style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:columnHeader style="table 5_CH" height="30" rowSpan="1">
+					<jr:column width="50" uuid="5e3b2126-a416-47d9-9546-96ff53d132b9">
+						<jr:columnHeader style="table 5_CH" height="60" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="caeedf54-1912-4560-b327-5f57a61ceb32"/>
+								<reportElement x="0" y="0" width="50" height="30" uuid="caeedf54-1912-4560-b327-5f57a61ceb32"/>
 								<text><![CDATA[U_DA]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 5_CH" height="60" rowSpan="1"/>
 						<jr:detailCell style="table 5_TD" height="30" rowSpan="1">
 							<textField>
-								<reportElement x="0" y="0" width="90" height="20" uuid="fae04795-85b6-45ad-b5d7-7888285392b2"/>
+								<reportElement x="0" y="0" width="50" height="30" uuid="fae04795-85b6-45ad-b5d7-7888285392b2"/>
 								<textFieldExpression><![CDATA[$F{U_DA}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="90" uuid="c837485c-7c33-4404-8b45-8685ecd4ca33">
-						<jr:tableHeader style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:tableFooter style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:columnHeader style="table 5_CH" height="30" rowSpan="1">
+					<jr:column width="50" uuid="c837485c-7c33-4404-8b45-8685ecd4ca33">
+						<jr:columnHeader style="table 5_CH" height="60" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="3679926b-54b4-4147-9694-04a9abf71ceb"/>
+								<reportElement x="0" y="0" width="50" height="30" uuid="3679926b-54b4-4147-9694-04a9abf71ceb"/>
 								<text><![CDATA[U_FE_DA]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 5_CH" height="60" rowSpan="1"/>
 						<jr:detailCell style="table 5_TD" height="30" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="90" height="20" uuid="bd1e0019-fe28-488f-88fd-19b7e14f1485"/>
+							<textField pattern="###0">
+								<reportElement x="0" y="0" width="50" height="30" uuid="bd1e0019-fe28-488f-88fd-19b7e14f1485"/>
 								<textFieldExpression><![CDATA[$F{U_FE_DA}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="90" uuid="256894c0-c4fa-427c-be32-0462d85c8b6a">
-						<jr:tableHeader style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:tableFooter style="table 5_TH" height="60" rowSpan="1"/>
-						<jr:columnHeader style="table 5_CH" height="30" rowSpan="1">
+					<jr:column width="73" uuid="256894c0-c4fa-427c-be32-0462d85c8b6a">
+						<jr:columnHeader style="table 5_CH" height="60" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="62406be2-89c5-4545-9cd5-300d0b8f13d1"/>
+								<reportElement x="0" y="0" width="73" height="30" uuid="62406be2-89c5-4545-9cd5-300d0b8f13d1"/>
 								<text><![CDATA[Ui2_Ai2]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="table 5_CH" height="60" rowSpan="1"/>
 						<jr:detailCell style="table 5_TD" height="30" rowSpan="1">
 							<textField>
-								<reportElement x="0" y="0" width="90" height="20" uuid="ad15c3d3-8e85-42ac-8de1-2cec5283d199"/>
+								<reportElement x="0" y="0" width="73" height="30" uuid="ad15c3d3-8e85-42ac-8de1-2cec5283d199"/>
 								<textFieldExpression><![CDATA[$F{Ui2_Ai2}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
