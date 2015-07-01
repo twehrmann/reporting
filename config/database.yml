@@ -1,0 +1,5 @@
+db:
+  host : reddbase.conabio.gob.mx
+  name : reporting
+  user : postgres
+  pass : postgres.
