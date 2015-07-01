@@ -21,14 +21,16 @@ getBaseData <- function(calculo_version) {
   # loads the PostgreSQL driver
   drv <- dbDriver("PostgreSQL")
   ## Open a connection
-  con <- dbConnect(drv, dbname="reporting", host="reddbase.conabio.gob.mx", user="postgres", password="postgres.")
+  con <- dbConnect(drv, dbname=config$db$name, host=config$db$host, user=config$db$user, password=config$db$pass)
+  
+  
   # v20 with warning: 3: In Cambios(y_t1 = y_t1, y_t2 = y_t2, t1 = t1, t2 = t2, conglomerado = conglomerado,  :NAs introduced by coercion
   if (calculo_version == 19) {
     BaseT1 = dbGetQuery(con, "select * from r_dcarbono.calculo_20140421_v19_t1")
     BaseT2 = dbGetQuery(con, "select * from r_dcarbono.calculo_20140421_v19_t2")
   } else if (calculo_version == 20) {
-    BaseT1 = dbGetQuery(con, "select * from mssql.calculo_sitio_20141208_v20_t1")
-    BaseT2 = dbGetQuery(con, "select * from mssql.calculo_sitio_20141208_v20_t2")
+    BaseT1 = dbGetQuery(con, "select * from mssql.calculo_sitio_v20_t1")
+    BaseT2 = dbGetQuery(con, "select * from mssql.calculo_sitio_v20_t2")
   }
   loginfo("Reading BUR data...")
   
@@ -69,7 +71,7 @@ storeResults <- function(db_table_name, data) {
   # loads the PostgreSQL driver
   drv <- dbDriver("PostgreSQL")
   ## Open a connection
-  con <- dbConnect(drv, dbname="reporting", host="reddbase.conabio.gob.mx", user="postgres", password="postgres.")
+  con <- dbConnect(drv, dbname=config$db$name, host=config$db$host, user=config$db$user, password=config$db$pass)
   
   
   if (dbExistsTable(con,db_table_name)) {

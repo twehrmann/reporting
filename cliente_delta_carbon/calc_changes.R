@@ -1,7 +1,7 @@
 library(dCarbono)
 
 fe_variable_gui="carbono_arboles"
-lcc_type_gui="MADMEX"
+lcc_type_gui="BUR"
 
 calcChanges <- function(fe_variable_gui, lcc_type_gui, inputData) {
   loginfo("Calculando cambio de los factores de emision...")
@@ -43,13 +43,11 @@ calcChanges <- function(fe_variable_gui, lcc_type_gui, inputData) {
   BaseT1<-inputData@BaseT1
   BaseT2<-inputData@BaseT2
   
-  
+
   BaseT1<-BaseT1[!(is.na(BaseT1$folio)),]
   BaseT2<-BaseT2[!(is.na(BaseT2$folio)),]
-  
-  BaseT1_orig<-BaseT1
-  
-  BaseVars = getAllVariables(BaseT1_orig)
+    
+  BaseVars = getAllVariables(BaseT1)
 
   ##############################Se crean bases de "T1" y "T2 s?lo con las variables de inter?s"###################################
   fe_variable=0

@@ -30,7 +30,7 @@ runModule <- function(fe_variable_gui, lcc_type_gui) {
 }
 
 if (DEBUG) {
-  loginfo (paste("Status of FE calculation:",runModule("carbono_arboles","MADMEX")))
+  #loginfo (paste("Status of FE calculation:",runModule("carbono_arboles","MADMEX")))
   loginfo (paste("Status of FE calculation:",runModule("carbono_arboles","BUR")))
   
   print(warnings())

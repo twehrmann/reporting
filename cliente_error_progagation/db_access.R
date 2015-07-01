@@ -16,7 +16,8 @@ getBaseData <- function() {
   # loads the PostgreSQL driver
   drv <- dbDriver("PostgreSQL")
   ## Open a connection
-  con <- dbConnect(drv, dbname="reporting", host="reddbase.conabio.gob.mx", user="postgres", password="postgres.")
+  con <- dbConnect(drv, dbname=config$db$name, host=config$db$host, user=config$db$user, password=config$db$pass)
+  
   BaseCruces = dbGetQuery(con, "select * from r_error_prop.cruces_series_inegi")
   BaseDinamica = dbGetQuery(con, "select * from r_error_prop.dinamica_bur")
   TablaFEdefor = dbGetQuery(con, "select * from r_error_prop.fe_deforestacion")
@@ -43,7 +44,8 @@ getBaseChangesData <- function() {
   # loads the PostgreSQL driver
   drv <- dbDriver("PostgreSQL")
   ## Open a connection
-  con <- dbConnect(drv, dbname="reporting", host="reddbase.conabio.gob.mx", user="postgres", password="postgres.")
+  con <- dbConnect(drv, dbname=config$db$name, host=config$db$host, user=config$db$user, password=config$db$pass)
+    
   AreasEstratos_BUR = dbGetQuery(con, "select * from r_dcarbono.areas_estratos")
 
   BaseT1 = dbGetQuery(con, "select * from r_dcarbono.calculo_20140421_v19_madmex_t1")
@@ -69,12 +71,13 @@ storeResults <- function(db_table_name, data) {
   # loads the PostgreSQL driver
   drv <- dbDriver("PostgreSQL")
   ## Open a connection
-  con <- dbConnect(drv, dbname="reporting", host="reddbase.conabio.gob.mx", user="postgres", password="postgres.")
+  con <- dbConnect(drv, dbname=config$db$name, host=config$db$host, user=config$db$user, password=config$db$pass)
+  
   
   
   if (dbExistsTable(con,db_table_name)) {
     dbRemoveTable(con,db_table_name)
-    print(paste("Removing existing table:",paste(db_table_name, collapse = '.')))
+    loginfo(paste("Removing existing table:",paste(db_table_name, collapse = '.')))
   }
   dbWriteTable(con,db_table_name,data)
  

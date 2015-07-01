@@ -5,6 +5,7 @@ setwd("/Volumes/SSD2go_tw/conafor/reporting/cliente_error_progagation")
 source("tools.R")
 source("db_access.R")
 source("calc_error_prop.R")
+DEBUG=TRUE
 
 inputData = getBaseData()
 DB_SCHEME="client_output"
@@ -16,14 +17,14 @@ runModule <- function(lcc_type_gui) {
   if (data@status) {
     db_table_name = c(DB_SCHEME,"FE_IPCC_abs_s2s3_BUR")
     success = storeResults(db_table_name, data@TablaEmiAbsS2S3)
-    print(success)
+    loginfo(success)
     db_table_name = c(DB_SCHEME,"FEFA_IPCC_BUR")
     success = storeResults(db_table_name, data@TablaFEFA)
-    print(success)
+    loginfo(success)
     
     db_table_name = c(DB_SCHEME,"FE_dinamica_BUR")
     success = storeResults(db_table_name, data@BaseTransiS2S3)
-    print(success)
+    loginfo(success)
     
     return(TRUE)
   } else {

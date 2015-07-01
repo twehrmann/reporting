@@ -2,4 +2,11 @@ db:
   host : reddbase.conabio.gob.mx
   name : reporting
   user : postgres
-  pass : postgres.
+  pass : 
+
+db-aws:
+  host : madmexdb.cugskh78cduk.us-west-1.rds.amazonaws.com
+  name : reporting
+  user : reporting
+  pass : 
+

@@ -65,7 +65,7 @@ calcErrorProp <- function(inputData) {
   
   #Se eliminan el estrato "NO APLICA"
   BaseTransiS2S3<-BaseTransiS2S3[BaseTransiS2S3$Dinamica!="NO APLICA",]
-  loginfo-7length(BaseTransiS2S3$S2_S3_p))
+  loginfo(length(BaseTransiS2S3$S2_S3_p))
   
   DifSeries<-4
   

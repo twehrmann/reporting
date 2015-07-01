@@ -1,12 +1,17 @@
 
 library(dCarbono)
 
-setwd("/Volumes/SSD2go_tw/conafor/R Client/cliente_delta_carbon")
+setwd("/Volumes/SSD2go_tw/conafor/reporting/cliente_delta_carbon")
 
-BaseT1<-read.csv("Calculo_20140421_CarbonoSitio(2004-2012)_VERSION_19_raices_CASO1y2_TOTALESt1.csv")
+
+#BaseT1<-read.csv("Calculo_20140421_CarbonoSitio(2004-2012)_VERSION_19_raices_CASO1y2_TOTALESt1.csv")
+BaseT1<-read.csv("CarbonoSitio(2004-2007)_VERSION_20.csv")
 BaseT1<-BaseT1[!(is.na(BaseT1$folio)),]
 
-BaseT2<-read.csv("Calculo_20140421_CarbonoSitio(2004-2012)_VERSION_19_raices_CASO1y2_TOTALESt2.csv")
+#BaseT2<-read.csv("Calculo_20140421_CarbonoSitio(2004-2012)_VERSION_19_raices_CASO1y2_TOTALESt2.csv")
+BaseT2<-read.csv("CarbonoSitio(2009-2013)_VERSION_20.csv")
+
+
 BaseT2<-BaseT2[!(is.na(BaseT2$folio)),]
 
 AreasEstratos<-read.csv("AreasEstratos.csv")
@@ -169,4 +174,4 @@ calcFE <- function(fe_variable_gui, lcc_type_gui) {
 
 print ("BUR")
 data=calcFE("carbono_arboles","BUR")
-write.csv(data, file = "FE_pot_carbono_arboles_bur.csv")
+write.csv(data, file = "FE_pot_carbono_arboles_bur_v20.csv")
