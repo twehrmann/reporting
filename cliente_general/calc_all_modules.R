@@ -8,7 +8,23 @@ source("calc_biomasa_viva.R")
 source("calc_error_prop.R")
 
 
-DEBUG=FALSE
+DEBUG=TRUE
+
+if (DEBUG) {
+  inputData = getBaseData_carbono5(BASE_VERSION)
+  inputData = getBaseData_dcarbono(calculo_version=BASE_VERSION)
+  inputData = getBaseData_biomasa(BASE_VERSION)
+  inputData = getBaseData_error_prop()
+  
+}
+
+writeResults <- function (filename, db_table_name, data) {
+  success=FALSE
+  success = storeResults(db_table_name, data)
+  success = storeResultCSV(paste0(filename,".csv"), data)
+  success = storeResultExcel(paste0(filename,".xls"), data)
+  return(success)
+}
 
 
 runModule_carbono5 <- function(fe_variable_gui, lcc_type_gui) {
@@ -17,9 +33,7 @@ runModule_carbono5 <- function(fe_variable_gui, lcc_type_gui) {
   
   data=calcFE(fe_variable_gui, lcc_type_gui, inputData)
   if (data@status) {
-    success = storeResults(db_table_name, data@result)
-    success = storeResultCSV(paste0(filename,".csv"), data@result)
-    success = storeResultExcel(paste0(filename,".xls"), data@result)
+    success = writeResults(filename, db_table_name, data@result)
   } else {
     success=FALSE
   }
@@ -35,9 +49,7 @@ runModule_dcarbono <- function(fe_variable_gui, lcc_type_gui) {
   filename = paste0(OUTPUT_PATH,"/",db_table_name[2])
   
   if (data@status) {
-    success = storeResults(db_table_name, data@result)
-    success = storeResultCSV(paste0(filename,".csv"), data@result)
-    success = storeResultExcel(paste0(filename,".xls"), data@result)
+    success = writeResults(filename, db_table_name, data@result)
   } else {
     success=FALSE
   }
@@ -57,13 +69,9 @@ runModule_biomasa_viva <- function(fe_variable_gui, lcc_type_gui) {
   filename_estrato = paste0(OUTPUT_PATH,"/",db_table_name_estrato[2])
   
   if (data@status) {
-    success = storeResults(db_table_name_sum, data@result_SummTotBv2)
-    success = storeResultCSV(paste0(filename_sum,".csv"), data@result_SummTotBv2)
-    success = storeResultExcel(paste0(filename_sum,".xls"), data@result_SummTotBv2)
+    success = writeResults(filename_sum, db_table_name_sum, data@result_SummTotBv2)
+    success = writeResults(filename_estrato, db_table_name_estrato, data@result_BaseEstrato)
     
-    success = storeResults(db_table_name_estrato, data@result_BaseEstrato)
-    success = storeResultCSV(paste0(filename_estrato,".csv"), data@result_BaseEstrato)
-    success = storeResultExcel(paste0(filename_estrato,".xls"), data@result_BaseEstrato)
   } else {
     success=FALSE
   }
@@ -77,14 +85,19 @@ runModule_fefa<- function(lcc_type_gui) {
   
   if (data@status) {
     db_table_name = c(DB_SCHEME,paste0("FEFA_IPCC_abs_s2s3_",lcc_type_gui))
+    filename = paste0(OUTPUT_PATH,"/",db_table_name[2])
+    success = writeResults(filename, db_table_name, data@TablaEmiAbsS2S3)
+    
     success = storeResults(db_table_name, data@TablaEmiAbsS2S3)
     loginfo(success)
     db_table_name = c(DB_SCHEME,paste0("FEFA_IPCC_",lcc_type_gui))
-    success = storeResults(db_table_name, data@TablaFEFA)
+    filename = paste0(OUTPUT_PATH,"/",db_table_name[2])
+    success = writeResults(filename, db_table_name, data@TablaFEFA)
     loginfo(success)
     
     db_table_name = c(DB_SCHEME, paste0("FEFA_dinamica_",lcc_type_gui))
-    success = storeResults(db_table_name, data@BaseTransiS2S3)
+    filename = paste0(OUTPUT_PATH,"/",db_table_name[2])
+    success = writeResults(filename, db_table_name, data@BaseTransiS2S3)
     loginfo(success)
     
     return(TRUE)

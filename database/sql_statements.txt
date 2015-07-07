@@ -1,1 +1,43 @@
 List of SQL statements
+
+
+Persistent areas:
+SELECT
+    m.rastercode,
+    ((classification.madmex2mad_abbr((m.rastercode)::INTEGER) || '-'::text) ||
+    classification.madmex2mad_abbr((m.rastercode)::INTEGER))                        AS madmex_05_10,
+    (((m.madmex_05_sqm - a5.change) - a10.change) / ((100.0 * 100.0))::DOUBLE PRECISION) AS
+    areas_cves4_cves5_pmn
+FROM
+    madmex.areas_estratos_madmex m,
+    (
+        SELECT
+            c5.lc05_mlbl              AS lc,
+            SUM(st_area(c5.the_geom)) AS change
+        FROM
+            landsat_changes.landsat_changes_05_08 c5
+        WHERE
+            (
+                c5.lc05_mlbl <> c5.lc08_mlbl)
+        GROUP BY
+            c5.lc05_mlbl) a5,
+    (
+        SELECT
+            c8.lc05_mlbl              AS lc,
+            SUM(st_area(c8.the_geom)) AS change
+        FROM
+            landsat_changes.landsat_changes_08_10 c8
+        WHERE
+            (
+                c8.lc08_mlbl <> c8.lc10_mlbl)
+        GROUP BY
+            c8.lc05_mlbl) a10
+WHERE
+    ((
+            a5.lc = m.rastercode)
+    AND (
+            a10.lc = m.rastercode))
+ORDER BY
+    m.rastercode
+
+Persistent areas combining change areas
