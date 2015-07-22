@@ -1,10 +1,23 @@
-#!/usr/bin/env python
+'''
+Created on Jul 22, 2015
+
+@author: thilo
+'''
+
+from flask.ext.script import Manager
+from flask.ext.migrate import Migrate, MigrateCommand
 import os
-import sys
 
-if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "reporting.settings")
+from app import app
+from flask_sqlalchemy import SQLAlchemy
 
-    from django.core.management import execute_from_command_line
+app.config.from_object(os.environ['APP_SETTINGS'])
+db = SQLAlchemy(app)
 
-    execute_from_command_line(sys.argv)
+migrate = Migrate(app, db)
+manager = Manager(app)
+
+manager.add_command('db', MigrateCommand)
+
+if __name__ == '__main__':
+    manager.run()

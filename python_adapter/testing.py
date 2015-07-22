@@ -6,7 +6,7 @@ robjects.r('source("tools.R")')
 r_getname = robjects.globalenv['ResultSet']
 robjects.r('source("db_access.R")')
 r_getname = robjects.globalenv['getBaseData']
-a=r_getname()
+a = r_getname()
 a
 a.isclass
 a.isclass()
