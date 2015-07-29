@@ -10,6 +10,11 @@ config = yaml.load_file("/Volumes/SSD2go_tw/conafor/reporting/config/database.ym
 OUTPUT_PATH = config$results$output_dir
 DB_SCHEME=config$results$db_schema
 BASE_VERSION = config$results$base_model_version
+REPORT_METADATA = config$results$metadata_table
+
+
+lcc.list = c("MADMEX", "BUR", "INEGI")
+stock.list = c("carbono_arboles","carbono_raices_por_sitio","carbono_muertospie","carbono_tocones")
 
 
 
@@ -56,6 +61,15 @@ setClass(Class="ResultSet_error_prop",
          )
 )
 
+setClass(Class="ResultSet_recuperation",
+         representation(
+           result="data.frame",
+           module="character",
+           variable="character",
+           status="logical"
+         )
+)
+
 
 
 
@@ -68,6 +82,7 @@ getAllVariables <- function(base) {
   return (BaseVars)
 }
 
+
 storeResultCSV <- function(filename, data) {
   loginfo(paste("Writing result to CSV file",filename))
   write.csv(data, file = filename)
@@ -78,4 +93,12 @@ storeResultExcel <- function(filename, data) {
   loginfo(paste("Writing result to XLS file",filename))
   WriteXLS("data", ExcelFileName = filename)
   return(TRUE)
+}
+
+writeResults <- function (filename, db_table_name, data) {
+  success=FALSE
+  success = storeResults(db_table_name, data)
+  success = storeResultCSV(paste0(filename,".csv"), data)
+  success = storeResultExcel(paste0(filename,".xls"), data)
+  return(success)
 }
