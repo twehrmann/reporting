@@ -8,8 +8,7 @@ Created on Jul 22, 2015
 
 from flask import Flask, abort, url_for, Response, request
 import os, json
-from models.models import get_table_object, AlchemyEncoder, \
-    get_view_object, get_all_observations, get_udm_observations
+from models.models import get_view_object
 
 from flask_sqlalchemy import SQLAlchemy
 from tools.cross_domain import crossdomain
@@ -17,16 +16,17 @@ from html import HTML
 from flask.ext.script import Manager
 from flask.ext.log import Logging
 
-import urllib
-from views import view_observations, view_single_observations, view_single_udm,\
-    view_all_udm, view_strata, makeHtmlTable
+from views import view_observations, view_single_observations, view_single_udm, \
+    view_all_udm, view_strata, makeHtmlTable, view_metadata
+from tools.config import getConfig
 
 
+config = getConfig()
 
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
-app.config['FLASK_LOG_LEVEL'] = 'DEBUG'
+app.config['FLASK_LOG_LEVEL'] = config["BASE"]["loglevel"]
 flask_log = Logging(app)
 
 manager = Manager(app)
@@ -35,8 +35,8 @@ db = SQLAlchemy()
 db.init_app(app)
 
 
-@app.route('/reports.json')
-def list_reports():
+@app.route('/reports.<format>')
+def list_reports(format):
     engine = db.get_engine(app)
 
     report_overview = dict()
@@ -125,11 +125,24 @@ def list_reports():
     response.status_code = 200
     return response
  
+def makeJsonResponse(data):
+    json_response = json.dumps(data)
+    response = Response(json_response, content_type='application/json; charset=utf-8')
+    response.headers.add('content-length', len(json_response))
+    response.status_code = 200
+    return response
 
-@app.route('/report/observation')
+def makeHtmlReponse(data):
+    response = Response(data, content_type='text/html; charset=utf-8')
+    response.headers.add('content-length', len(data))
+    response.status_code = 200
+    return response
+    
+
+@app.route('/report/observation.<format>')
 @crossdomain(origin='*')
-def observation_json():
-    view_mode = None#"arbolado_vivo"
+def observation_json(format):
+    view_mode = request.args.get('mode')
     a = request.args.get('from')
     b = request.args.get('to')
     if a == None:
@@ -141,17 +154,20 @@ def observation_json():
     else:
         b = int(float(b))
         
-    app.logger.debug('Observation range %d - %d' % (a,b))
+    app.logger.debug('Observation range %d - %d' % (a, b))
     engine = db.get_engine(app)
-    
     obs = view_observations(engine, (a, b), view_mode)
     
-    return json.dumps(obs)
+    if format == "json":
+        return makeJsonResponse(obs)
+    elif format == "html":
+        return makeHtmlReponse(makeHtmlTable(obs))
+    
     
         
-@app.route('/report/observation/<udm_id>.json')
+@app.route('/report/observation/<udm_id>.<format>')
 @crossdomain(origin='*')
-def observation_udm_json(udm_id):
+def observation_udm_json(udm_id, format):
     udm_id = int(float(udm_id))
     view_mode = request.args.get('mode')
 
@@ -159,26 +175,32 @@ def observation_udm_json(udm_id):
     obs = view_single_observations(engine, udm_id, mode=view_mode)
     
     if obs != None:
-        return json.dumps(obs)
+        if format == "json":
+            return makeJsonResponse(obs)
+        elif format == "html":
+            return makeHtmlReponse(makeHtmlTable(obs))
     else:
         abort(404)
         
 
-@app.route('/report/udm/<cycle>/<id>.json')
+@app.route('/report/udm/<cycle>/<id>.<format>')
 @crossdomain(origin='*')
-def single_udm_json(cycle, id):
+def single_udm_json(cycle, id, format):
     view_mode = request.args.get('mode')
     engine = db.get_engine(app)
     obs = view_single_udm(engine, id, cycle, view_mode)
     
     if len(obs) > 0:
-        return json.dumps(obs)
+        if format == "json":
+            return makeJsonResponse(obs)
+        elif format == "html":
+            return makeHtmlReponse(makeHtmlTable(obs))
     else:
         abort(404)
         
-@app.route('/report/udm/<cycle>')
+@app.route('/report/udm/<cycle>.<format>')
 @crossdomain(origin='*')
-def all_udm_json(cycle):
+def all_udm_json(cycle, format):
     view_mode = request.args.get('mode')
     a = request.args.get('from')
     b = request.args.get('to')
@@ -192,54 +214,41 @@ def all_udm_json(cycle):
         b = int(float(b))
         
     engine = db.get_engine(app)
-    obs = view_all_udm(engine, (a,b), cycle, view_mode)
+    obs = view_all_udm(engine, (a, b), cycle, view_mode)
     
     if len(obs) > 0:
-        return json.dumps(obs, cls=AlchemyEncoder)
+        if format == "json":
+            return makeJsonResponse(obs)
+        elif format == "html":
+            return makeHtmlReponse(makeHtmlTable(obs))
     else:
         abort(404)
         
-@app.route('/report/strata/<subcategory>/<strata_type>/<cycle>/<stock>.json')
+@app.route('/report/strata/<subcategory>/<strata_type>/<cycle>/<stock>.<format>')
 @crossdomain(origin='*')
-def single_strata(subcategory, strata_type, cycle, stock):
+def single_strata(subcategory, strata_type, cycle, stock, format):
     view_mode = request.args.get('mode')
     engine = db.get_engine(app)
     obs = view_strata(engine, subcategory, strata_type, cycle, stock, view_mode)
     
     if len(obs) > 0:
-        return json.dumps(obs)
+        if format == "json":
+            return makeJsonResponse(obs)
+        elif format == "html":
+            return makeHtmlReponse(makeHtmlTable(obs))
     else:
         abort(404)
         
-@app.route('/report/strata/<subcategory>/<strata_type>/<cycle>/<stock>.html')
+
+@app.route('/report/version.html')
 @crossdomain(origin='*')
-def single_strata_html(subcategory, strata_type, cycle, stock):
-    view_mode = request.args.get('mode')
+def get_metadata_report():
     engine = db.get_engine(app)
-    obs = view_strata(engine, subcategory, strata_type, cycle, stock, view_mode)
-    
-    if len(obs) > 0:
-        return Response(makeHtmlTable(obs), mimetype="text/html")     
+    metadata = view_metadata(engine)
+    if len(metadata) > 0:
+        return makeHtmlReponse(makeHtmlTable(metadata)) 
     else:
         abort(404)
-
-@app.route('/pot/<LCC_SCHEME>/<STOCK>.json')
-@crossdomain(origin='*')
-def table_json(LCC_SCHEME, STOCK):
-    engine = db.get_engine(app)
-
-    tablename = "fe_pot_strata_%s_%s" % (STOCK.lower(), LCC_SCHEME.lower())
-    table_data = get_table_object(engine, tablename)
-    if len(table_data) > 0:
-        return Response(h, mimetype="text/html")   
-    else:
-        abort(404)        
-
-def has_no_empty_params(rule):
-    defaults = rule.defaults if rule.defaults is not None else ()
-    arguments = rule.arguments if rule.arguments is not None else ()
-    return len(defaults) >= len(arguments)
-
    
 @app.route("/")
 @manager.command
@@ -265,4 +274,4 @@ def site_map():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5555)
+    app.run(host=config["BASE"]["IP"], port=config["BASE"]["port"])

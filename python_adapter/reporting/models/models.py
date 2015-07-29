@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 '''
 Created on Jul 22, 2015
 
@@ -12,61 +14,50 @@ from sqlsoup import TableClassType
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.orm import load_only
 
-DB_SCHEMA = "client_output"
-CYCLES = {"T1":"calculo_sitio_v20_t1", "T2":"calculo_sitio_v20_t2"}
+from tools.config import getConfig
+import decimal
 
-class AlchemyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj.__class__, TableClassType):
-            # an SQLAlchemy class
-            fields = {}
-            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
-                data = obj.__getattribute__(field)
-                try:
-                    if field != "c":    # eliminate column names
-                        json.dumps(data) # this will fail on non-encodable values, like other classes
-                        fields[field] = data
-                except TypeError:
-                    fields[field] = None
-            # a json-encodable dict
-            return fields
-    
-        return json.JSONEncoder.default(self, obj)
+config = getConfig()
+
+DB_SCHEMA = config["DB_SCHEMA_RESULTS"]
+CYCLES = config["BASE_TABLES_UDM"]
 
 
-def get_table_object(engine, table_name, limit_a=0, limit_b=100):
+
+
+def get_table_object(engine, table_name, limit_a=0, limit_b=100, prim_key=False):
     db = sqlsoup.SQLSoup(engine)
     try:
         pa_t = Table(table_name, db._metadata, autoload=True, schema=DB_SCHEMA)
-        pa = db.map(pa_t)
+        if prim_key == False:
+            pa = db.map(pa_t)
+        else:
+            pa = db.map(pa_t, primary_key=[pa_t.c.id])
 
-        return pa.slice(limit_a,limit_b).all()
+        return pa.slice(limit_a, limit_b).all()
     except NoSuchTableError:
         return list()
     
 def get_view_object(engine, view_name):
     db = sqlsoup.SQLSoup(engine)
     result = list()
-    rp = db.execute('select var, count from %s.%s '% (DB_SCHEMA,view_name))
-    for var,count in rp.fetchall():
+    rp = db.execute('select var, count from %s.%s ' % (DB_SCHEMA, view_name))
+    for var, count in rp.fetchall():
         result.append((var, count))
         
     return result
-
-if __name__ == '__main__':
-    for item in get_table_object("fe_pot_strata_carbono_arboles_bur"):
-        print item.Estrato
-        
-    print json.dumps(get_table_object("fe_pot_strata_carbono_arboles_bur"), cls=AlchemyEncoder)
     
 
-def readTable(engine, scheme, table):
+def readTable(engine, scheme, table, prim_key=False):
     db = sqlsoup.SQLSoup(engine)
     print "Accessing table %s.%s" % (scheme, table)
 
     try:
         observation_table = Table(table, db._metadata, autoload=True, schema=scheme)
-        table_data = db.map(observation_table)
+        if prim_key == False:
+            table_data = db.map(observation_table)
+        else:
+            table_data = db.map(observation_table, primary_key=[observation_table.c.id])
 
         return table_data
     except NoSuchTableError, err:
@@ -74,17 +65,17 @@ def readTable(engine, scheme, table):
         return None
 
 def get_all_observations(engine, limit_a=0, limit_b=100):
-    table_name = "calculo_20140303_CarbonoArbolado_raices_caso1y2"
-    schema_name = "mssql"
+    table_name = config["BASE_TABLES_OBS"]["T1"]
+    schema_name = config["DB_SCHEMA_BASE"]
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
-        return mapping.slice(limit_a,limit_b).all()
+        return mapping.slice(limit_a, limit_b).all()
     else:
         return list()
 
 def get_udm_observations(engine, udm_id):
-    table_name = "calculo_20140303_CarbonoArbolado_raices_caso1y2"
-    schema_name = "mssql"
+    table_name = config["BASE_TABLES_OBS"]["T1"]
+    schema_name = config["DB_SCHEMA_BASE"]
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
         return mapping.filter_by(id_unidad_muestreo=udm_id).all()
@@ -96,7 +87,7 @@ def get_udm(engine, udm_id, cycle):
         return list()
     
     table_name = CYCLES[cycle]
-    schema_name = "mssql"
+    schema_name = config["DB_SCHEMA_BASE"]
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
         return mapping.filter_by(id_unidad_muestreo=udm_id).all()
@@ -108,24 +99,35 @@ def get_all_udm(engine, (limit_a, limit_b), cycle):
         return list()
     
     table_name = CYCLES[cycle]
-    schema_name = "mssql"
+    schema_name = config["DB_SCHEMA_BASE"]
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
-        return mapping.slice(limit_a,limit_b).all()
+        return mapping.slice(limit_a, limit_b).all()
     else:
         return list()
 
 def get_strata(engine, subcategory, strata_type, cycle, stock):
+    table_name = None
     if subcategory.lower() == "tf-tf":
-        table_name= "fe_delta_strata_%s_%s" % (stock.lower(), strata_type.lower())
+        table_name = str(config["STRATA_DEFINITION"][subcategory.lower()]) % (stock.lower(), strata_type.lower())
     elif subcategory.lower() == "tf-ot":
-        table_name = "fe_pot_strata_%s_%s" % (stock.lower(), strata_type.lower())
-    elif subcategory.lower() == "tf-tf":
-        pass
-    elif subcategory.lower() == "tf-tf":
-        pass
+        table_name = str(config["STRATA_DEFINITION"][subcategory.lower()]) % (stock.lower(), strata_type.lower())
+    elif subcategory.lower() == "tfd-tf":
+        table_name = str(config["STRATA_DEFINITION"][subcategory.lower()]) % (stock.lower(), strata_type.lower())
+    elif subcategory.lower() == "tf-tfd":
+        table_name = str(config["STRATA_DEFINITION"][subcategory.lower()]) % (stock.lower(), strata_type.lower())
     
+    if table_name == None:
+        return list()
     mapping = readTable(engine, DB_SCHEMA, table_name)
+    if mapping != None:
+        return mapping.all()
+    else:
+        return list()
+    
+def get_all_metadata(engine):
+    table_name = config["BASE"]["metadata_table"]
+    mapping = readTable(engine, DB_SCHEMA, table_name, prim_key=True)
     if mapping != None:
         return mapping.all()
     else:
