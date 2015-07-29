@@ -12,7 +12,15 @@ storeResults <- function(db_table_name, data) {
     dbRemoveTable(con,db_table_name)
     print(paste("Removing existing table:",paste(db_table_name, collapse = '.')))
   }
-  dbWriteTable(con,db_table_name,data)
+  
+  data$id = seq(nrow(data))
+  new_struct = data
+  new_struct = new_struct[c(ncol(data), seq(ncol(data)-1))]
+  dbWriteTable(con,db_table_name,new_struct, row.names=FALSE)
+  
+  SQL =paste0("ALTER TABLE ",paste(db_table_name, collapse = '.')," ADD PRIMARY KEY (id)")
+  rs  <- dbSendQuery( con, SQL)
+  
   
   
   ## Closes the connection
@@ -25,9 +33,22 @@ storeResults <- function(db_table_name, data) {
 }
 
 
-setwd("/Volumes/SSD2go_tw/conafor/R scripts Oswaldo/3 Recuperacion Reforestación")
-DB_SCHEME  ="r_estfe_recuperacion_refor"
-data<-read.csv("Calculo_20131030_CarbonoHectarea(2004-2012)_VERSION_19_t2.csv")
-
-db_table_name = c(DB_SCHEME, "calculo_20131030_v19_t2")
+setwd("/Volumes/SSD2go_tw/conafor/tablas_reports_luis")
+DB_SCHEME  ="mssql"
+data<-read.csv("Calculo_20150721_Reporte_Nivel_Observacion_Estimacion_(2004-2007)_version_20.txt", sep="\t", header=TRUE)
+db_table_name = c(DB_SCHEME, "import_calculo_20150727_obs_t1")
 print(storeResults(db_table_name, data))
+
+data<-read.csv("Calculo_20150721_Reporte_Nivel_Observacion_Estimacion_(2009-2013)_version_20.txt", sep="\t", header=TRUE)
+db_table_name = c(DB_SCHEME, "import_calculo_20150727_obs_t2")
+print(storeResults(db_table_name, data))
+
+data<-read.csv("Calculo_20150727_Reporte_Nivel_UnidadMuestreo_Estimacion_(2004-2007)_version_20.csv", header=TRUE)
+db_table_name = c(DB_SCHEME, "import_calculo_20150727_udm_t1")
+print(storeResults(db_table_name, data))
+
+data<-read.csv("Calculo_20150727_Reporte_Nivel_UnidadMuestreo_Estimacion_(2009-2013)_version_20.csv", header=TRUE)
+db_table_name = c(DB_SCHEME, "import_calculo_20150727_udm_t2")
+print(storeResults(db_table_name, data))
+
+
