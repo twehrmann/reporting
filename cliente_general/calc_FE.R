@@ -1,7 +1,29 @@
 library(Carbono5)
 
+
+runModule_carbono5 <- function(fe_variable_gui, lcc_type_gui) {
+  db_table_name = tolower(c(DB_SCHEME, paste0("FE_pot_strata_",fe_variable_gui,"_",lcc_type_gui)))
+  filename = tolower(paste0(OUTPUT_PATH,"/",db_table_name[2]))
+  description = ""
+  module = "carbono5"
+  level = "strata"
+  stock_type = fe_variable_gui
+  lcc = lcc_type_gui
+  
+  data=calcFE(fe_variable_gui, lcc_type_gui, inputData)
+  if (data@status) {
+    success = writeResults(filename, db_table_name, data@result)
+    success = registerResult(db_table_name[2], db_table_name[1], description, module, stock_type, lcc,level)
+  } else {
+    success=FALSE
+  }
+  print(success)
+  
+  return(success)
+}
+
 fe_variable_gui="carbono_arboles"
-lcc_type_gui="INEGI"
+lcc_type_gui="BUR"
 
 calcFE <- function(fe_variable_gui, lcc_type_gui, inputData) {
   loginfo("Calculando Factores de Emision...")
@@ -72,8 +94,8 @@ calcFE <- function(fe_variable_gui, lcc_type_gui, inputData) {
   
   if (! (fe_variable_gui %in% names(all_vars))) {
     df <- data.frame(test=character()) 
-    
-    return(new("ResultSet",
+    logerror(paste("Variable:",fe_variable_gui,"not found in ",names(all_vars)))
+    return(new("ResultSet_carbono5",
                result=df,
                module="Estimadores de razón",
                variable=FE_VAR,

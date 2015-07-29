@@ -1,5 +1,29 @@
 library(dCarbono)
 
+
+runModule_dcarbono <- function(fe_variable_gui, lcc_type_gui) {
+  data=calcChanges(fe_variable_gui, lcc_type_gui, inputData)
+  db_table_name = tolower(c(DB_SCHEME, paste0("FE_delta_strata_",fe_variable_gui,"_",lcc_type_gui)))
+  filename = tolower(paste0(OUTPUT_PATH,"/",db_table_name[2]))
+  description = ""
+  module = "dcarbono"
+  level = "strata"
+  
+  stock_type = fe_variable_gui
+  lcc = lcc_type_gui
+  
+  if (data@status) {
+    success = writeResults(filename, db_table_name, data@result)
+    success = registerResult(db_table_name[2], db_table_name[1], description, module, stock_type, lcc,level)
+  } else {
+    success=FALSE
+  }
+  print(success)
+  
+  return(success)
+}
+
+
 fe_variable_gui="carbono_arboles"
 lcc_type_gui="BUR"
 

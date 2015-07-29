@@ -12,6 +12,41 @@ myfun_Prom <- function(x){c(Prom_ai=mean(x[!is.na(x)]))}
 myfun_yi <- function(x){c(yi=sum(x))}
 
 
+runModule_biomasa_viva <- function(fe_variable_gui, lcc_type_gui) {
+  data=calcBiomasaViva(fe_variable_gui, lcc_type_gui, inputData)
+  success=FALSE
+  
+  module = "biomasa_viva"
+  level = "sitio"
+  
+  stock_type = fe_variable_gui
+  lcc = lcc_type_gui
+  
+  db_table_name_sum = tolower(c(DB_SCHEME, paste0("FE_bm_sum_sitio_",fe_variable_gui,"_",lcc_type_gui)))
+  filename_sum = tolower(paste0(OUTPUT_PATH,"/",db_table_name_sum[2]))
+  
+  db_table_name_estrato = tolower(c(DB_SCHEME, paste0("FE_bm_estrato_sitio_",fe_variable_gui,"_",lcc_type_gui)))
+  filename_estrato = tolower(paste0(OUTPUT_PATH,"/",db_table_name_estrato[2]))
+  
+  if (data@status) {
+    success = writeResults(filename_sum, db_table_name_sum, data@result_SummTotBv2)
+    description = "sum per sitio"
+    success = registerResult(db_table_name_sum[2], db_table_name_sum[1], description, module, stock_type, lcc, level)
+    
+    success = writeResults(filename_estrato, db_table_name_estrato, data@result_BaseEstrato)
+    description = "biomasa por estrato por sitio"
+    success = registerResult(db_table_name_estrato[2], db_table_name_estrato[1], description, module, stock_type, lcc, level)
+    
+    
+  } else {
+    success=FALSE
+  }
+  print(success)
+  
+  return(success)
+}
+
+
 fe_variable_gui ="carbono_arboles"
 lcc_type_gui = "BUR"
 
