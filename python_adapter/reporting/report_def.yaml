@@ -1,0 +1,55 @@
+# Model definitions
+DB_SCHEMA_RESULTS: client_output
+DB_SCHEMA_BASE: mssql
+
+BASE:
+    IP: 0.0.0.0
+    port: 5555
+    debug: True
+    loglevel: DEBUG
+    metadata_table: v_last_reports
+    timestamp_fmt: "%Y-%m-%d %H:%M:%S"
+    date_fmt: "%Y-%m-%d"
+    float_fmt: "%.3f"
+    max_string_length: 25
+
+BASE_TABLES_UDM:
+    T1: calculo_20150721_reporte_nivel_udm_estimacion_t1_v20
+    T2: calculo_20150721_reporte_nivel_udm_estimacion_t2_v20
+
+BASE_TABLES_OBS:
+    T1: calculo_20150721_reporte_nivel_observacion_estimacion_t1_v20
+    T2: calculo_20150721_reporte_nivel_observacion_estimacion_t2_v20
+
+
+STRATA_DEFINITION:
+    tf-tf: "fe_delta_strata_%s_%s"
+    tf-ot: "fe_pot_strata_%s_%s"
+    tfd-tf: "fe_rec_strata_%s_%s"
+    tf-tfd: "fe_deg_strata_%s_%s"
+
+OBS_COLUMN_MAPPER:
+    arbolado_vivo:
+        - id_unidad_muestreo
+        - numero_arbol
+        - carbono_aereo_estimado
+UDM_COLUMN_MAPPER:
+    arbolado_vivo:
+        - id_unidad_muestreo
+        - numero_arbol
+        - carbono_arboles
+STRATA_COLUMN_MAPPER:
+    short:
+        - Estrato
+        - NumCong
+        - NumSitios
+        - AreaHa
+        - ER
+        - U
+    degrad:
+        - Estrato
+        - numero
+        - parametro
+        - ER
+        - Ulwr
+        - Uuwr
