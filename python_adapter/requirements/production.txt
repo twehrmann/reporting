@@ -1,2 +1,13 @@
 # Install everything that needs to be compiled
--r production.txt
+sqlalchemy
+sqlsoup
+
+flask
+Flask-Migrate
+Flask-Script
+Flask-SQLAlchemy
+
+xlsxwriter
+HTML
+rpy2
+pyyaml
