@@ -17,7 +17,7 @@ runModule_biomasa_viva <- function(fe_variable_gui, lcc_type_gui) {
   success=FALSE
   
   module = "biomasa_viva"
-  level = "sitio"
+  level = "udm"
   
   stock_type = fe_variable_gui
   lcc = lcc_type_gui

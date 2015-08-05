@@ -4,22 +4,38 @@ library(relimp)# libreria para visualizar la matriz de datos
 
 runModule_fefa<- function(lcc_type_gui) {
   data=calcErrorProp(lcc_type_gui, inputData)
+  success=FALSE
+  
+  module = "factores de emision con error propagacion"
+  level = "pais"
+  
+  stock_type = "agregacion"
+  lcc = lcc_type_gui
   
   if (data@status) {
     db_table_name = tolower(c(DB_SCHEME,paste0("FEFA_IPCC_abs_s2s3_",lcc_type_gui)))
     filename = tolower(paste0(OUTPUT_PATH,"/",db_table_name[2]))
+    description = "incertidumbre por clase del IPCC"
     success = writeResults(filename, db_table_name, data@TablaEmiAbsS2S3)
+    success = registerResult(db_table_name[2], db_table_name[1], description, module, stock_type, lcc, level)
+    
     
     success = storeResults(db_table_name, data@TablaEmiAbsS2S3)
     loginfo(success)
     db_table_name = tolower(c(DB_SCHEME,paste0("FEFA_IPCC_",lcc_type_gui)))
     filename = tolower(paste0(OUTPUT_PATH,"/",db_table_name[2]))
+    description = "base de FE y FA con su respectiva dinámica"
     success = writeResults(filename, db_table_name, data@TablaFEFA)
+    success = registerResult(db_table_name[2], db_table_name[1], description, module, stock_type, lcc, level)
+    
     loginfo(success)
     
     db_table_name = tolower(c(DB_SCHEME, paste0("FEFA_dinamica_",lcc_type_gui)))
     filename = tolower(paste0(OUTPUT_PATH,"/",db_table_name[2]))
+    description = "agregacion de la emisión y las incertidumbres a nivel de Clase IPCC"
     success = writeResults(filename, db_table_name, data@BaseTransiS2S3)
+    success = registerResult(db_table_name[2], db_table_name[1], description, module, stock_type, lcc, level)
+    
     loginfo(success)
     
     return(TRUE)

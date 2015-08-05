@@ -13,10 +13,20 @@ runModule_recuperation <- function(fe_variable_gui, lcc_type_gui) {
   data=calcRecup_refor(fe_variable_gui, lcc_type_gui, inputData)
   success=FALSE
   
+  module = "refoRecu"
+  level = "estrato"
+  
+  stock_type = fe_variable_gui
+  lcc = lcc_type_gui
+  
   if (data@status) {
     db_table_name = tolower(c(DB_SCHEME, paste0("FE_rec_strata_",fe_variable_gui,"_",lcc_type_gui)))
     filename = tolower(paste0(OUTPUT_PATH,"/",db_table_name[2]))
+    description = "Tasas de recuperación / reforestación"
+    
     success = writeResults(filename, db_table_name, data@result)
+    success = registerResult(db_table_name[2], db_table_name[1], description, module, stock_type, lcc, level)
+    
   } else {
     success=FALSE
   }
