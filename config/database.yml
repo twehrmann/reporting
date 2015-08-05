@@ -44,6 +44,7 @@ results: # RESULT data set definition
   output_dir : /Volumes/SSD2go_tw/conafor/reporting/results
   db_schema : client_output
   base_model_version : 20
+  metadata_table : client_output.fe_reports_metadata
 
 db: # database connection
   host : reddbase.conabio.gob.mx

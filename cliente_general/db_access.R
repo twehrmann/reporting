@@ -61,6 +61,24 @@ setClass(Class="InputStructure_error_prop",
          )
 )
 
+setClass(Class="InputStructure_recuperation",
+         representation(         
+           BaseT1="data.frame",
+           BaseT2="data.frame",
+           
+           EstratoCongT1_BUR="data.frame",
+           EstratoCongT2_BUR="data.frame",
+           EstratosIPCC_BUR="data.frame",
+           AreasEstratos_BUR="data.frame",
+           
+           
+           EstratoCongT1_MADMEX="data.frame",
+           EstratoCongT2_MADMEX="data.frame",
+           EstratosIPCC_MADMEX="data.frame",
+           AreasEstratos_MADMEX="data.frame"
+         )
+)
+
 
 getBaseData_error_prop <- function() {
   # loads the PostgreSQL driver
@@ -76,8 +94,8 @@ getBaseData_error_prop <- function() {
   #TablaFApermaP_BUR= dbGetQuery(con, "select * from r_error_prop.fe_permanencia")
   
   #NEW VERSION 
-  TablaFEdefor_BUR = dbGetQuery(con, config$input_data$TablaFEdefor_BUR)
-  TablaFApermaP_BUR= dbGetQuery(con, config$input_data$TablaFApermaP_BUR)
+  TablaFEdefor_BUR = dbGetQuery(con, 'SELECT "Estrato", "nCong" AS n, "ER_Carboles" AS "FE", "U_Carboles"  AS "U" FROM  client_output.FE_bm_estrato_sitio_carbono_arboles_BUR')
+  TablaFApermaP_BUR= dbGetQuery(con, 'SELECT"Estrato" || \' - \' ||"Estrato" AS "Estrato","NumCong"  AS n,"ER" AS "FE", "U" FROM client_output.FE_delta_strata_carbono_arboles_BUR')
   
   TablaFEdegra_BUR= dbGetQuery(con, config$input_data$TablaFEdegra_BUR)
   TablaFArecup_BUR= dbGetQuery(con, config$input_data$TablaFArecup_BUR)
@@ -113,6 +131,55 @@ getBaseData_error_prop <- function() {
 }
 
 
+getBaseData_recuperation <- function(calculo_version) {
+  loginfo(paste0("Reading base data... v",calculo_version))
+  # loads the PostgreSQL driver
+  drv <- dbDriver("PostgreSQL")
+  ## Open a connection
+  con <- dbConnect(drv, dbname=config$db$name, host=config$db$host, user=config$db$user, password=config$db$pass)
+  
+  
+  if (calculo_version == 19) {
+    BaseT1 = dbGetQuery(con, "select * from r_fe_recup_refor.calculo_20131030_v19_t1")
+    BaseT2 = dbGetQuery(con, "select * from r_fe_recup_refor.calculo_20131030_v19_t2")
+  } else if (calculo_version == 20) {
+    BaseT1 = dbGetQuery(con, "select * from mssql.calculo_sitio_v20_t1")
+    BaseT2 = dbGetQuery(con, "select * from mssql.calculo_sitio_v20_t2")
+  }
+  loginfo("Reading BUR data...")
+  
+  AreasEstratos_BUR = dbGetQuery(con, "select * from r_dcarbono.areas_estratos_pmn")
+  EstratoCongT1_BUR = dbGetQuery(con, 'select * from r_fe_recup_refor."EstratosCongPMNgusSerieIV"')
+  EstratoCongT2_BUR = dbGetQuery(con,  'select * from r_fe_recup_refor."EstratosCongPMNgusSerieV"')
+  EstratosIPCC_BUR = dbGetQuery(con, "select * from r_biomasa_viva.estratos_pmn_ipcc")
+  
+  loginfo("Reading MADMEX data...")
+  AreasEstratos_MADMEX = dbGetQuery(con, "select madmex_05_10, areas_cves4_cves5_pmn from madmex.v_areas_estratos_persistent_lcc")
+  EstratoCongT1_MADMEX= dbGetQuery(con, "select * from  madmex.estrato_cong_pmn_gus_serie4_2_madmex_05_10")
+  EstratoCongT2_MADMEX= dbGetQuery(con, "select * from  madmex.estrato_cong_pmn_gus_serie4_2_madmex_05_10")
+  EstratosIPCC_MADMEX= dbGetQuery(con, "select * from madmex.v_estratos_madmex_ipcc")
+  
+  
+  ## Closes the connection
+  dbDisconnect(con)
+  ## Frees all the resources on the driver
+  dbUnloadDriver(drv)
+  
+  return(new("InputStructure_recuperation",
+             BaseT1=BaseT1,
+             BaseT2=BaseT2,
+             
+             AreasEstratos_BUR=AreasEstratos_BUR,
+             EstratoCongT1_BUR=EstratoCongT1_BUR,
+             EstratoCongT2_BUR=EstratoCongT2_BUR,
+             EstratosIPCC_BUR=EstratosIPCC_BUR,
+             
+             AreasEstratos_MADMEX=AreasEstratos_MADMEX,
+             EstratoCongT1_MADMEX=EstratoCongT1_MADMEX,
+             EstratoCongT2_MADMEX=EstratoCongT2_MADMEX,
+             EstratosIPCC_MADMEX=EstratosIPCC_MADMEX
+  ))
+}
 
 getBaseData_biomasa <- function(calculo_version) {
   loginfo(paste0("Reading base data... v",calculo_version))
@@ -268,7 +335,37 @@ storeResults <- function(db_table_name, data) {
     dbRemoveTable(con,db_table_name)
     loginfo(paste("Removing existing table:",paste(db_table_name, collapse = '.')))
   }
-  dbWriteTable(con,db_table_name,data)
+  data$id = seq(nrow(data))
+  new_struct = data
+  new_struct = new_struct[c(ncol(data), seq(ncol(data)-1))]
+  dbWriteTable(con,db_table_name,new_struct, row.names=FALSE)
+  
+  SQL =paste0("ALTER TABLE ",paste(db_table_name, collapse = '.')," ADD PRIMARY KEY (id)")
+  rs  <- dbSendQuery( con, SQL)
+  
+  ## Closes the connection
+  dbDisconnect(con)
+  ## Frees all the resources on the driver
+  dbUnloadDriver(drv)
+  
+  
+  return(TRUE)
+}
+
+registerResult <- function(db_table_name, db_scheme, description, module, stock_type, lcc, level) {
+  # loads the PostgreSQL driver
+  drv <- dbDriver("PostgreSQL")
+  ## Open a connection
+  con <- dbConnect(drv, dbname=config$db$name, host=config$db$host, user=config$db$user, password=config$db$pass)
+  
+  
+  pg_table <- tolower(paste(db_table_name, collapse = '.'))
+  
+  SQL = paste0("INSERT INTO ",REPORT_METADATA," (table_name, table_scheme, description, module, stock_type, lcc, level) VALUES (")
+  SQL = paste0(SQL, "'",db_table_name,"', ", "'",db_scheme,"', ", "'",description,"', ", "'",module,"', ", "'",stock_type,"', ", "'",lcc,"', '",level,"');")
+
+  
+  rs  <- dbSendQuery( con, SQL)
   
   
   ## Closes the connection

@@ -2,6 +2,35 @@ library(doBy)
 library(relimp)# libreria para visualizar la matriz de datos
 
 
+runModule_fefa<- function(lcc_type_gui) {
+  data=calcErrorProp(lcc_type_gui, inputData)
+  
+  if (data@status) {
+    db_table_name = tolower(c(DB_SCHEME,paste0("FEFA_IPCC_abs_s2s3_",lcc_type_gui)))
+    filename = tolower(paste0(OUTPUT_PATH,"/",db_table_name[2]))
+    success = writeResults(filename, db_table_name, data@TablaEmiAbsS2S3)
+    
+    success = storeResults(db_table_name, data@TablaEmiAbsS2S3)
+    loginfo(success)
+    db_table_name = tolower(c(DB_SCHEME,paste0("FEFA_IPCC_",lcc_type_gui)))
+    filename = tolower(paste0(OUTPUT_PATH,"/",db_table_name[2]))
+    success = writeResults(filename, db_table_name, data@TablaFEFA)
+    loginfo(success)
+    
+    db_table_name = tolower(c(DB_SCHEME, paste0("FEFA_dinamica_",lcc_type_gui)))
+    filename = tolower(paste0(OUTPUT_PATH,"/",db_table_name[2]))
+    success = writeResults(filename, db_table_name, data@BaseTransiS2S3)
+    loginfo(success)
+    
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+  print(success)
+  
+  return(success)
+}
+
 calcErrorProp <- function(lcc_type_gui, inputData) {
   loginfo("Calculando FE con incerditumbres")
   loginfo(paste("GUI setting: ", lcc_type_gui))
