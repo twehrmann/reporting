@@ -95,7 +95,8 @@ getBaseData_error_prop <- function() {
   
   #NEW VERSION 
   TablaFEdefor_BUR = dbGetQuery(con, 'SELECT "Estrato", "nCong" AS n, "ER_Carboles" AS "FE", "U_Carboles"  AS "U" FROM  client_output.FE_bm_estrato_sitio_carbono_arboles_BUR')
-  TablaFApermaP_BUR= dbGetQuery(con, 'SELECT"Estrato" || \' - \' ||"Estrato" AS "Estrato","NumCong"  AS n,"ER" AS "FE", "U" FROM client_output.FE_delta_strata_carbono_arboles_BUR')
+  #TablaFApermaP_BUR= dbGetQuery(con, 'SELECT"Estrato" || \' - \' ||"Estrato" AS "Estrato","NumCong"  AS n,"ER" AS "FE", "U" FROM client_output.FE_delta_strata_carbono_arboles_BUR')
+  TablaFApermaP_BUR= dbGetQuery(con, 'SELECT "Estrato", "NumCong" AS n, "ER" AS "FE", "U"  AS "U" FROM  client_output.fe_pot_strata_carbono_arboles_bur')
   
   TablaFEdegra_BUR= dbGetQuery(con, config$input_data$TablaFEdegra_BUR)
   TablaFArecup_BUR= dbGetQuery(con, config$input_data$TablaFArecup_BUR)

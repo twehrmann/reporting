@@ -8,7 +8,7 @@ source("calc_biomasa_viva.R")
 source("calc_error_prop.R")
 source("calc_recup_refor.R")
 
-DEBUG=FALSE
+DEBUG=TRUE
 
 if (DEBUG) {
   inputData = getBaseData_carbono5(BASE_VERSION)
@@ -65,15 +65,15 @@ if (DEBUG) {
 }
 
 inputData=0
-inputData = getBaseData_recuperation(20)
+inputData = getBaseData_recuperation(BASE_VERSION)
 
 
 if (DEBUG) {
-  for (lcc in lcc.list) {
+  for (lcc in lcc.list[2]) {
     loginfo (paste("Status of FE calculation:",runModule_recuperation("carbono_arboles",lcc)))
   } 
-  } else if (FULL) {
-    for (stock in stock.list[4]) {
+  } else {
+    for (stock in stock.list[1:2]) {
       for (lcc in lcc.list[2]) {
         loginfo (paste("Status of FE calculation:",runModule_recuperation(stock, lcc)))
       }
@@ -84,7 +84,7 @@ if (DEBUG) {
 inputData=0
 inputData = getBaseData_error_prop()
 
-for (lcc in lcc.list) {
+for (lcc in lcc.list[1:2]) {
   success = runModule_fefa(lcc)
 } 
 
