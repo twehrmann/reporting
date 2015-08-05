@@ -8,20 +8,17 @@ Created on Jul 22, 2015
 
 from sqlalchemy import Table
 import sqlsoup
-import json
 
-from sqlsoup import TableClassType
 from sqlalchemy.exc import NoSuchTableError
-from sqlalchemy.orm import load_only
 
-from tools.config import getConfig
-import decimal
+from config import getConfig
+from tools.table_names import getObservationTable, getUdmTable,\
+    getStrataTables, getMetadataTable
 
 config = getConfig()
 
 DB_SCHEMA = config["DB_SCHEMA_RESULTS"]
-CYCLES = config["BASE_TABLES_UDM"]
-
+CYCLES_UDM = config["BASE_TABLES_UDM"]
 
 
 
@@ -64,18 +61,17 @@ def readTable(engine, scheme, table, prim_key=False):
         print err
         return None
 
-def get_all_observations(engine, limit_a=0, limit_b=100):
-    table_name = config["BASE_TABLES_OBS"]["T1"]
-    schema_name = config["DB_SCHEMA_BASE"]
+def get_all_observations(engine, cycle, limit_a=0, limit_b=100):
+    schema_name, table_name = getObservationTable(cycle)
+
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
         return mapping.slice(limit_a, limit_b).all()
     else:
         return list()
 
-def get_udm_observations(engine, udm_id):
-    table_name = config["BASE_TABLES_OBS"]["T1"]
-    schema_name = config["DB_SCHEMA_BASE"]
+def get_udm_observations(engine, cycle, udm_id):
+    schema_name, table_name = getObservationTable(cycle)
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
         return mapping.filter_by(id_unidad_muestreo=udm_id).all()
@@ -83,11 +79,7 @@ def get_udm_observations(engine, udm_id):
         return list()
 
 def get_udm(engine, udm_id, cycle):
-    if cycle not in CYCLES.keys():
-        return list()
-    
-    table_name = CYCLES[cycle]
-    schema_name = config["DB_SCHEMA_BASE"]
+    schema_name, table_name = getUdmTable(cycle)
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
         return mapping.filter_by(id_unidad_muestreo=udm_id).all()
@@ -95,11 +87,7 @@ def get_udm(engine, udm_id, cycle):
         return list()
     
 def get_all_udm(engine, (limit_a, limit_b), cycle):
-    if cycle not in CYCLES.keys():
-        return list()
-    
-    table_name = CYCLES[cycle]
-    schema_name = config["DB_SCHEMA_BASE"]
+    schema_name, table_name = getUdmTable(cycle)
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
         return mapping.slice(limit_a, limit_b).all()
@@ -107,28 +95,29 @@ def get_all_udm(engine, (limit_a, limit_b), cycle):
         return list()
 
 def get_strata(engine, subcategory, strata_type, cycle, stock):
-    table_name = None
-    if subcategory.lower() == "tf-tf":
-        table_name = str(config["STRATA_DEFINITION"][subcategory.lower()]) % (stock.lower(), strata_type.lower())
-    elif subcategory.lower() == "tf-ot":
-        table_name = str(config["STRATA_DEFINITION"][subcategory.lower()]) % (stock.lower(), strata_type.lower())
-    elif subcategory.lower() == "tfd-tf":
-        table_name = str(config["STRATA_DEFINITION"][subcategory.lower()]) % (stock.lower(), strata_type.lower())
-    elif subcategory.lower() == "tf-tfd":
-        table_name = str(config["STRATA_DEFINITION"][subcategory.lower()]) % (stock.lower(), strata_type.lower())
+    schema_name, table_name = getStrataTables(subcategory, strata_type, cycle, stock)
     
-    if table_name == None:
-        return list()
-    mapping = readTable(engine, DB_SCHEMA, table_name)
+    mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
         return mapping.all()
     else:
         return list()
     
 def get_all_metadata(engine):
-    table_name = config["BASE"]["metadata_table"]
-    mapping = readTable(engine, DB_SCHEMA, table_name, prim_key=True)
+    schema_name, table_name = getMetadataTable()
+    mapping = readTable(engine, schema_name, table_name, prim_key=True)
     if mapping != None:
         return mapping.all()
     else:
         return list()
+    
+def get_metadata_single_table(engine, db_schema, product_table):
+    schema_name, table_name = getMetadataTable()
+    mapping = readTable(engine, schema_name, table_name, prim_key=True)
+
+    if mapping != None:
+        table_metadata = mapping.filter_by(table_name = product_table, table_scheme = db_schema).first()
+        return table_metadata
+    else:
+        raise Exception("No product table: %s found"%product_table)
+

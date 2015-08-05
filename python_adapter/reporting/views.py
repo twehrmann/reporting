@@ -6,15 +6,15 @@ Created on Jul 24, 2015
 @author: thilo
 '''
 from models.models import get_all_observations, \
-    get_udm_observations, get_udm, get_all_udm, get_strata, get_all_metadata
+    get_udm_observations, get_udm, get_all_udm, get_strata, get_all_metadata,\
+    get_metadata_single_table
 import json
 from sqlsoup import TableClassType
 from html import HTML
 import collections
 import datetime
-from tools.config import getConfig
+from config import getConfig
 import decimal
-import HTMLParser
 
 
 config = getConfig()
@@ -22,7 +22,6 @@ config = getConfig()
 OBS_COLUMN_MAPPER = config["OBS_COLUMN_MAPPER"]
 UDM_COLUMN_MAPPER = config["UDM_COLUMN_MAPPER"]
 STRATA_COLUMN_MAPPER = config["STRATA_COLUMN_MAPPER"]
-
 
 
 def sqlAlchemy2Dict(obj, shortenString=False):
@@ -55,40 +54,40 @@ def sqlAlchemy2Dict(obj, shortenString=False):
                     structure[field] = data
             except TypeError, error:
                 print error
-                print type(data)
-                print field, data
+                print field, data, type(data)
                 structure[field] = None
 
         return structure
     
 def transformStructure(obs, mode, translation, shortenString=False):
     structure = list()
-    
-    if mode != None:
-        structure.append({"structure":translation[mode]})
-        for item in obs:
-            structure.append({k: v for k, v in sqlAlchemy2Dict(item, shortenString).items() if k in translation[mode]})
+    if len(obs) > 0:
+        if mode != None:
+            structure.append({"structure":translation[mode]})
+            for item in obs:
+                structure.append({k: v for k, v in sqlAlchemy2Dict(item, shortenString).items() if k in translation[mode]})
+        else:
+            structure.append({"structure":sqlAlchemy2Dict(obs[0]).keys()})
+            for item in obs:
+                structure.append(sqlAlchemy2Dict(item, shortenString))
+        return structure
     else:
-        structure.append({"structure":sqlAlchemy2Dict(obs[0]).keys()})
-        for item in obs:
-            structure.append(sqlAlchemy2Dict(item, shortenString))
-    
-    return structure
+        return None
 
 
 
-def view_observations(engine, (a, b), mode=None):
+def view_observations(engine, cycle, (a, b), mode=None):
     if mode not in OBS_COLUMN_MAPPER.keys():
         mode = None
-    obs = get_all_observations(engine, a, b)
-    return transformStructure(obs, mode, OBS_COLUMN_MAPPER)
+    obs = get_all_observations(engine,cycle,  a, b)
+    return transformStructure(obs, mode, OBS_COLUMN_MAPPER, shortenString=True)
    
 
-def view_single_observations(engine, udm_id, mode=None):
+def view_single_observations(engine, cycle, udm_id, mode=None):
     if mode not in OBS_COLUMN_MAPPER.keys():
         mode = None     
-    obs = get_udm_observations(engine, udm_id)
-    return transformStructure(obs, mode, OBS_COLUMN_MAPPER)
+    obs = get_udm_observations(engine, cycle, udm_id)
+    return transformStructure(obs, mode, OBS_COLUMN_MAPPER, shortenString=True)
 
 
 def view_single_udm(engine, udm_id,cycle, mode=None):
@@ -115,8 +114,16 @@ def view_metadata(engine):
     metadata=get_all_metadata(engine)
     return transformStructure(metadata, None, None)
 
-def makeHtmlTable(table_data):
+def view_metadata_table(engine,tablename):
+    metadata=get_metadata_single_table(engine, tablename)
+    return transformStructure(metadata, None, None)
+
+
+def makeHtmlTable(table_data, title=None):
     h = HTML()
+    if title != None:
+        h.title(title)
+        
     t = h.table(border='1')
     
     if len(table_data) > 0:
@@ -128,7 +135,6 @@ def makeHtmlTable(table_data):
 
         for row in table_data[1:]:      
             for item in keys:
-                print row[item]
                 r.td(unicode(row[item]))    
             r.tr
     return unicode(h)
