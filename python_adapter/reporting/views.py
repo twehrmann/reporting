@@ -5,78 +5,32 @@ Created on Jul 24, 2015
 
 @author: thilo
 '''
+
+from flask import Flask
+from flask.ext.log import Logging
+
 from models.models import get_all_observations, \
     get_udm_observations, get_udm, get_all_udm, get_strata, get_all_metadata,\
-    get_metadata_single_table
-import json
-from sqlsoup import TableClassType
-from html import HTML
-import collections
-import datetime
-from config import getConfig
-import decimal
-
-
-config = getConfig()
-
-OBS_COLUMN_MAPPER = config["OBS_COLUMN_MAPPER"]
-UDM_COLUMN_MAPPER = config["UDM_COLUMN_MAPPER"]
-STRATA_COLUMN_MAPPER = config["STRATA_COLUMN_MAPPER"]
-
-
-def sqlAlchemy2Dict(obj, shortenString=False):
-    if isinstance(obj.__class__, TableClassType):
-        # an SQLAlchemy class
-        structure = collections.OrderedDict()
-        for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
-            data = obj.__getattribute__(field)
-            #print data, type(data)
-            
-            # Format variables
-            if isinstance(data, datetime.date):
-                data = data.strftime(config["BASE"]["date_fmt"])
-            if isinstance(data, datetime.datetime):
-                data = data.strftime(config["BASE"]["timestamp_fmt"])
-            if isinstance(data, decimal.Decimal):
-                    data = float(data)
-                    
-            if isinstance(data, float):
-                if int(float(data)) == data:
-                    data = int(float(data))
-                else:
-                    data = float(config["BASE"]["float_fmt"] % data)
-            if isinstance(data, str) or isinstance(data, unicode):
-                if len(data) > int(config["BASE"]["max_string_length"]) and shortenString:
-                    data = data[:config["BASE"]["max_string_length"]]+"..."
-            try:
-                if field != "c":  # eliminate column names
-                    json.dumps(data)  # this will fail on non-encodable values, like other classes
-                    structure[field] = data
-            except TypeError, error:
-                print error
-                print field, data, type(data)
-                structure[field] = None
-
-        return structure
+    get_metadata_single_table, get_biomasa_udm
     
-def transformStructure(obs, mode, translation, shortenString=False):
-    structure = list()
-    if len(obs) > 0:
-        if mode != None:
-            structure.append({"structure":translation[mode]})
-            for item in obs:
-                structure.append({k: v for k, v in sqlAlchemy2Dict(item, shortenString).items() if k in translation[mode]})
-        else:
-            structure.append({"structure":sqlAlchemy2Dict(obs[0]).keys()})
-            for item in obs:
-                structure.append(sqlAlchemy2Dict(item, shortenString))
-        return structure
-    else:
-        return None
+from html import HTML
+from config import getConfig, OBS_COLUMN_MAPPER, UDM_COLUMN_MAPPER,\
+    STRATA_COLUMN_MAPPER, UDM_BIOMASA_MAPPER
+from tools.converter import transformStructure
+
+
+app = Flask(__name__)
+with app.app_context():
+    # within this block, current_app points to app.
+    app.config['FLASK_LOG_LEVEL'] = getConfig()["BASE"]["loglevel"]
+    flask_log = Logging(app)
+
+    
 
 
 
 def view_observations(engine, cycle, (a, b), mode=None):
+    app.logger.info("OBSERVATION VIEW for %s between %s:%s" % (cycle, a, b))
     if mode not in OBS_COLUMN_MAPPER.keys():
         mode = None
     obs = get_all_observations(engine,cycle,  a, b)
@@ -84,6 +38,7 @@ def view_observations(engine, cycle, (a, b), mode=None):
    
 
 def view_single_observations(engine, cycle, udm_id, mode=None):
+    app.logger.info("SINGLE OBSERVATION VIEW for %s if udm_id %d" % (cycle, udm_id))
     if mode not in OBS_COLUMN_MAPPER.keys():
         mode = None     
     obs = get_udm_observations(engine, cycle, udm_id)
@@ -102,6 +57,14 @@ def view_all_udm(engine, (a,b),cycle, mode=None):
         mode = None
     obs=get_all_udm(engine, (a,b), cycle)
     return transformStructure(obs, mode, UDM_COLUMN_MAPPER)
+
+def view_udm(engine, strata_type, cycle, stock, mode):
+    if mode not in STRATA_COLUMN_MAPPER.keys():
+        mode = None
+    
+    obs=get_biomasa_udm(engine, strata_type, cycle, stock)
+    return transformStructure(obs, mode, UDM_BIOMASA_MAPPER)
+
 
 def view_strata(engine, subcategory, strata_type, cycle, stock, mode):
     if mode not in STRATA_COLUMN_MAPPER.keys():

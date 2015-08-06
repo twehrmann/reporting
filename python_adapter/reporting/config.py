@@ -23,7 +23,13 @@ def getConfig(configFile=CONFIG):
     
     return dict()
 
-    
+   
+
+OBS_COLUMN_MAPPER = getConfig()["OBS_COLUMN_MAPPER"]
+UDM_COLUMN_MAPPER = getConfig()["UDM_COLUMN_MAPPER"]
+STRATA_COLUMN_MAPPER = getConfig()["STRATA_COLUMN_MAPPER"]
+UDM_BIOMASA_MAPPER = getConfig()["UDM_BIOMASA_MAPPER"]
+ 
 
 
 class Config(object):
@@ -31,7 +37,7 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'm*\xc8Mw\xaa\x91\xd9o\xa0\xf5\xd0\x03!\xbc\xe9\xa9\x0f\x10\x94\xac,\x8e\xd8'
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:postgres.@reddbase/reporting"
+    SQLALCHEMY_DATABASE_URI = getConfig()["BASE"]["DB_STRING"]
 
 
 class ProductionConfig(Config):

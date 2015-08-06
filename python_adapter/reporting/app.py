@@ -17,14 +17,16 @@ from flask.ext.script import Manager
 from flask.ext.log import Logging
 
 from views import view_observations, view_single_observations, view_single_udm, \
-    view_all_udm, view_strata, makeHtmlTable, view_metadata, view_metadata_table
+    view_all_udm, view_strata, makeHtmlTable, view_metadata, view_metadata_table, \
+    view_udm
 from config import getConfig
 from tools.output_formats import makeJsonResponse, makeHtmlReponse, \
     makeExcelResponse, ExcelReport
-from tools.table_names import getObservationTable, getUdmTable, getStrataTables
+from tools.table_names import getObservationTable, getUdmTable, getStrataTables, \
+    getUdmBiomasaTables
 import time
 import datetime
-from tools.r_calculation import code, BASE, CARBONO5, DCARBONO, BIOMASA,\
+from tools.r_calculation import code, BASE, CARBONO5, DCARBONO, BIOMASA, \
     RECUPERATION, FEFA
 from collections import OrderedDict
 
@@ -44,8 +46,8 @@ db = SQLAlchemy()
 db.init_app(app)
 
 
-@app.route('/reports.<format>')
-def list_reports(format):
+@app.route('/reports.<resource_format>')
+def list_reports(resource_format):
     engine = db.get_engine(app)
 
     report_overview = dict()
@@ -135,9 +137,9 @@ def list_reports(format):
     return response
 
 
-@app.route('/report/observation/T<int:cycle>.<format>')
+@app.route('/report/observation/T<int:cycle>.<resource_format>')
 @crossdomain(origin='*')
-def observation_json(cycle, format):
+def observation_json(cycle, resource_format):
     view_mode = request.args.get('mode')
     a = int(float(request.args.get('from', default=0)))
     b = int(float(request.args.get('to', default=MAX_DEF_RESULT)))
@@ -146,11 +148,11 @@ def observation_json(cycle, format):
     engine = db.get_engine(app)
     obs = view_observations(engine, "T%d" % cycle, (a, b), view_mode)
     
-    if format == "json":
+    if resource_format == "json":
         return makeJsonResponse(obs)
-    elif format == "html":
+    elif resource_format == "html":
         return makeHtmlReponse(makeHtmlTable(obs, title='Observation range id: %d - %d' % (a, b)))
-    elif format == "xls":
+    elif resource_format == "xls":
         db_schema, tablename = getObservationTable(cycle)
         excel = ExcelReport()
         excel.filename = "reporte_nivel_observacion"
@@ -162,9 +164,9 @@ def observation_json(cycle, format):
     
     
         
-@app.route('/report/observation/T<int:cycle>/<int:udm_id>.<format>')
+@app.route('/report/observation/T<int:cycle>/<int:udm_id>.<resource_format>')
 @crossdomain(origin='*')
-def observation_udm_json(cycle, udm_id, format):
+def observation_udm_json(cycle, udm_id, resource_format):
     udm_id = int(float(udm_id))
     view_mode = request.args.get('mode')
 
@@ -172,11 +174,11 @@ def observation_udm_json(cycle, udm_id, format):
     obs = view_single_observations(engine, "T%d" % cycle, udm_id, mode=view_mode)
     
     if obs != None:
-        if format == "json":
+        if resource_format == "json":
             return makeJsonResponse(obs)
-        elif format == "html":
+        elif resource_format == "html":
             return makeHtmlReponse(makeHtmlTable(obs))
-        elif format == "xls":
+        elif resource_format == "xls":
             db_schema, tablename = getObservationTable(cycle)
         excel = ExcelReport()
         excel.filename = "reporte_nivel_observacion"
@@ -187,19 +189,19 @@ def observation_udm_json(cycle, udm_id, format):
         abort(404)
         
 
-@app.route('/report/udm/T<int:cycle>/<int:id>.<format>')
+@app.route('/report/udm/T<int:cycle>/<int:id>.<resource_format>')
 @crossdomain(origin='*')
-def single_udm_json(cycle, id, format):
+def single_udm_json(cycle, id, resource_format):
     view_mode = request.args.get('mode')
     engine = db.get_engine(app)
     obs = view_single_udm(engine, id, "T%d" % cycle, view_mode)
     
     if obs != None:
-        if format == "json":
+        if resource_format == "json":
             return makeJsonResponse(obs)
-        elif format == "html":
+        elif resource_format == "html":
             return makeHtmlReponse(makeHtmlTable(obs))
-        elif format == "xls":
+        elif resource_format == "xls":
             db_schema, tablename = getUdmTable(cycle)
             excel = ExcelReport()
             excel.filename = "reporte_nivel_udm_%d" % id
@@ -209,9 +211,9 @@ def single_udm_json(cycle, id, format):
     else:
         abort(404)
         
-@app.route('/report/udm/T<int:cycle>.<format>')
+@app.route('/report/udm/T<int:cycle>.<resource_format>')
 @crossdomain(origin='*')
-def all_udm_json(cycle, format):
+def all_udm_json(cycle, resource_format):
     view_mode = request.args.get('mode')
     a = int(float(request.args.get('from', default=0)))
     b = int(float(request.args.get('to', default=MAX_DEF_RESULT)))
@@ -220,11 +222,11 @@ def all_udm_json(cycle, format):
     obs = view_all_udm(engine, (a, b), cycle, view_mode)
     
     if len(obs) > 0:
-        if format == "json":
+        if resource_format == "json":
             return makeJsonResponse(obs)
-        elif format == "html":
+        elif resource_format == "html":
             return makeHtmlReponse(makeHtmlTable(obs))
-        elif format == "xls":
+        elif resource_format == "xls":
             db_schema, tablename = getUdmTable(cycle)
             excel = ExcelReport()
             excel.filename = "reporte_nivel_udm"
@@ -233,10 +235,33 @@ def all_udm_json(cycle, format):
             return makeExcelResponse(obs, excel)
     else:
         abort(404)
-        
-@app.route('/report/strata/<subcategory>/<strata_type>/T<int:cycle>/<stock>.<format>')
+ 
+@app.route('/report/udm/<strata_type>/T<int:cycle>/<stock>.<resource_format>')
 @crossdomain(origin='*')
-def single_strata(subcategory, strata_type, cycle, stock, format):
+def single_udm(strata_type, cycle, stock, resource_format):
+    view_mode = request.args.get('mode', "all")
+    engine = db.get_engine(app)
+    cycle = "T%d" % cycle
+    obs = view_udm(engine, strata_type, cycle, stock, view_mode)
+
+    if len(obs) > 0:
+        if resource_format == "json":
+            return makeJsonResponse(obs)
+        elif resource_format == "html":
+            return makeHtmlReponse(makeHtmlTable(obs))
+        elif resource_format == "xls":
+            db_schema, tablename = getUdmBiomasaTables(strata_type, cycle, stock)
+            excel = ExcelReport()
+            excel.filename = "reporte_nivel_strata"
+            excel.metadata = get_metadata_single_table(engine, db_schema, tablename)
+            excel.setSource(cycle)
+            return makeExcelResponse(obs, excel)
+    else:
+        abort(404)
+               
+@app.route('/report/strata/<subcategory>/<strata_type>/T<int:cycle>/<stock>.<resource_format>')
+@crossdomain(origin='*')
+def single_strata(subcategory, strata_type, cycle, stock, resource_format):
     view_mode = request.args.get('mode')
     engine = db.get_engine(app)
     cycle = "T%d" % cycle
@@ -244,11 +269,11 @@ def single_strata(subcategory, strata_type, cycle, stock, format):
     obs = view_strata(engine, subcategory, strata_type, cycle, stock, view_mode)
     
     if len(obs) > 0:
-        if format == "json":
+        if resource_format == "json":
             return makeJsonResponse(obs)
-        elif format == "html":
+        elif resource_format == "html":
             return makeHtmlReponse(makeHtmlTable(obs))
-        elif format == "xls":
+        elif resource_format == "xls":
             db_schema, tablename = getStrataTables(subcategory, strata_type, cycle, stock)
             excel = ExcelReport()
             excel.filename = "reporte_nivel_strata"
@@ -284,18 +309,24 @@ def get_metadata_table_report(tablename):
 def site_map():
     h = HTML()
     output = []
+    variables_examples =  getConfig()["BASE"]["EXAMPLE_URLS"]
+    variables_documentation = getConfig()["BASE"]["DOCUMENTATION_URLS"]
+    
     for rule in app.url_map.iter_rules():
-
+        documentation = list()
         options = {}
         for arg in rule.arguments:
-            options[arg] = "[{0}]".format(arg)
+            print "V",arg
+            options[arg] = variables_examples[arg]
+            documentation.append({arg:variables_documentation[arg]})
 
+        print url_for(rule.endpoint, **options)
         url = url_for(rule.endpoint, _external=True, **options)
-        output.append((rule.endpoint, url))
+        output.append((rule.endpoint, url, documentation))
 
     with h.ul as l:
         for line in sorted(output):
-            l.li("[%s]: %s" % (line[0], line[1]))
+            l.li("[%s]: %s: %s" % (line[0], line[1], line[2]))
             l.a
         
     return str(h)
@@ -321,7 +352,7 @@ def calculate_reports():
         except ValueError, error:
             return str(error)
         
-        processing_time[component] = str(time.time()-old_time)
+        processing_time[component] = str(time.time() - old_time)
         old_time = time.time()
       
     h.h2("Processing time:")
@@ -338,4 +369,5 @@ def calculate_reports():
 
 
 if __name__ == '__main__':
+    app.logger.info("Starting web interface to REDD+ reports...")
     app.run(host=config["BASE"]["IP"], port=config["BASE"]["port"])

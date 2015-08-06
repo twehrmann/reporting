@@ -6,6 +6,9 @@ Created on Jul 22, 2015
 @author: thilo
 '''
 
+from flask import Flask
+from flask.ext.log import Logging
+
 from sqlalchemy import Table
 import sqlsoup
 
@@ -13,12 +16,20 @@ from sqlalchemy.exc import NoSuchTableError
 
 from config import getConfig
 from tools.table_names import getObservationTable, getUdmTable,\
-    getStrataTables, getMetadataTable
+    getStrataTables, getMetadataTable, getUdmBiomasaTables
 
 config = getConfig()
 
 DB_SCHEMA = config["DB_SCHEMA_RESULTS"]
 CYCLES_UDM = config["BASE_TABLES_UDM"]
+
+app = Flask(__name__)
+with app.app_context():
+    # within this block, current_app points to app.
+    app.config['FLASK_LOG_LEVEL'] = getConfig()["BASE"]["loglevel"]
+    flask_log = Logging(app)
+
+   
 
 
 
@@ -91,6 +102,15 @@ def get_all_udm(engine, (limit_a, limit_b), cycle):
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
         return mapping.slice(limit_a, limit_b).all()
+    else:
+        return list()
+    
+def get_biomasa_udm(engine, strata_type, cycle, stock):
+    schema_name, table_name = getUdmBiomasaTables(strata_type, cycle, stock)
+    
+    mapping = readTable(engine, schema_name, table_name)
+    if mapping != None:
+        return mapping.all()
     else:
         return list()
 

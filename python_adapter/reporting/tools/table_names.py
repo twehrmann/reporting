@@ -31,6 +31,13 @@ def getUdmTable(cycle):
     
     return schema_name, table_name
 
+def getUdmBiomasaTables(strata_type, cycle, stock):
+    schema_name = config["DB_SCHEMA_RESULTS"]
+    table_name = config["TABLES_UDM_BIOMASA"]["estrato"] % (stock.lower(), strata_type.lower())
+    
+    return  schema_name, table_name
+
+
 def getStrataTables(subcategory, strata_type, cycle, stock):
     schema_name = config["DB_SCHEMA_RESULTS"]
     
@@ -43,7 +50,7 @@ def getStrataTables(subcategory, strata_type, cycle, stock):
     elif subcategory.lower() == "tf-tfd":
         table_name = str(config["STRATA_DEFINITION"][subcategory.lower()]) % (stock.lower(), strata_type.lower())
     else:
-        raise Exception("No table mapped to %s,%s,%s,%s"%(subcategory, strata_type, cycle, stock))
+        raise Exception("No table mapped to %s,%s,%s,%s" % (subcategory, strata_type, cycle, stock))
     
     return  schema_name, table_name
 
