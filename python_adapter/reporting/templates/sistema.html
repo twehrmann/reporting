@@ -1,0 +1,181 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sistema Nacional de Monitoreo de Emisiones Forestales (SINAMEF)</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/foundation.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/foundation-icons/foundation-icons.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/jquery.dataTables.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/dataTables.foundation.css') }}">
+
+<script src="{{ url_for('static', filename='js/vendor/modernizr.js') }}"></script>
+</head>
+<body>
+	<nav class="top-bar" data-topbar>
+		<ul class="title-area">
+
+			<li class="name">
+				<h1>
+					<a href="#"> Sistema Nacional de Monitoreo de Emisiones Forestales </a>
+				</h1>
+			</li>
+			<li class="toggle-topbar menu-icon"><a href="#"><span>menu</span></a></li>
+		</ul>
+		<section class="top-bar-section">
+			<ul class="right">
+				<li class="divider"></li>
+				<li><a href="#"><i class="fi-trees"></i> Antecedentes</a></li>
+				<li class="divider"></li>
+				<li class="has-dropdown"><a href="#"><i class="fi-database"></i> Metadatos</a>
+					<ul class="dropdown">
+						<li><a href="#">Dropdown Option</a></li>
+						<li><a href="#">Dropdown Option</a></li>
+						<li><a href="#">Dropdown Option</a></li>
+						<li class="divider"></li>
+						<li><a href="#">See all →</a></li>
+					</ul></li>
+			</ul>
+		</section>
+	</nav>
+	<div class="row">
+		<div class="large-4 columns">
+			<h1>
+				<i class="fi-wrench"></i> SINAMEF
+			</h1>
+
+		</div>
+		<div class="large-8 columns">
+			<h3></h3>
+		</div>
+	</div>
+	<div class="row">
+		<div class="large-8 push-4 columns">
+			<table id="strata" class="display" cellspacing="0" width="100%">
+				<caption id="tableCaption"><i>Por favor marcar un reporte.</i></caption>
+			</table>
+
+			<ul class="inline-list right">
+				<li><a href="#"><i class="fi-page-export-csv"></i> Exportar como Excel archivo</a></li>
+
+			</ul>
+		</div>
+		<div class="large-4 pull-8 columns">
+
+			<ul class="accordion" data-accordion role="tablist">
+				<li class="accordion-navigation"><a href="#panel1d" role="tab" id="panel1d-heading" aria-controls="panel1d">Observación</a>
+					<div id="panel1d" class="content active" role="tabpanel" aria-labelledby="panel1d-heading">
+						<ul class="stack button-group" id="observationGroup">
+							<label id="observationPeriod">Período <select>
+									<option value="T1">2004-2007 (T1)</option>
+									<option value="T2">2009-2014 (T2)</option>
+							</select>
+							</label>
+							<li><a id="ObservationAV" href="#" class="button"><i class="fi-trees"></i>Arbolado vivo</a></li>
+							<li><a id="ObservationMEP" href="#" class="button"><i class="fi-trees"></i>Arboles muertos en pie</a></li>
+							<li><a href="#" class="button"><i class="fi-trees"></i>Tocones</a></li>
+							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Hojarasca</a></li>
+							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Suelos</a></li>
+						</ul>
+					</div></li>
+					
+				<li class="accordion-navigation"><a href="#panel2d" role="tab" id="panel2d-heading" aria-controls="panel2d">Unidad de
+						Muestreo</a>
+					<div id="panel2d" class="content" role="tabpanel" aria-labelledby="panel2d-heading">
+						<ul class="stack button-group">
+						<label id="udmPeriod">Período <select>
+									<option value="T1">2004-2007 (T1)</option>
+									<option value="T2">2009-2014 (T2)</option>
+							</select>
+							</label>
+							<li><a id="UdmAV" href="#" class="button"><i class="fi-trees"></i>Arbolado vivo</a></li>
+							<li><a id="UdmM" href="#" class="button"><i class="fi-trees"></i>Arboles muertos en pie</a></li>
+							<li><a id="UdmT" href="#" class="button"><i class="fi-trees"></i>Tocones</a></li>
+							<li><a href="#" class="button disabled"><i class="fi-trees"></i>MLC</a></li>
+							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Hojarasca</a></li>
+							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Suelos</a></li>
+						</ul>
+					</div></li>
+					
+				<li class="accordion-navigation"><a href="#panel3d" role="tab" id="panel3d-heading" aria-controls="panel3d">Estrato</a>
+					<div id="panel3d" class="content" role="tabpanel" aria-labelledby="panel3d-heading">
+						<label>Subcategoría <select id="strataSubcategory">
+								<option value="tf-tf">TF:TF Tierras Forestales convertidas en Tierras Forestales</option>
+								<option value="tfd-tf">TFd:TF Tierras Forestales degradadas convertidas en Tierras Forestales</option>
+								<option value="tf-tfd">TF:TFd Tierras Forestales convertidas en Tierras Forestales degradadas</option>
+								<option value="tf-ot">TF:OT Tierras Forestales convertidas en Otras Tierras</option>
+								<option value="ot-tf">OT:TF Otras Tierras convertidas en Tierras Forestales</option>
+						</select>
+						</label> <label>Estratificación <select id="strataStratification">
+								<option value="madmex">MAD MEX (32 Clases)</option>
+								<option value="bur">INEGI (Agrupado en las clases del BUR)</option>
+								<option value="inegi">INEGI (agrupado en las clases de MADMEX)</option>
+						</select>
+						</label> <label>Período <select id="strataPeriod">
+								<option value="T1">2004-2007 (T1)</option>
+								<option value="T2">2009-2014 (T2)</option>
+						</select>
+						</label> <label>Depósito<select id="strataDeposit">
+								<option value="carbono_arboles">Biomasa Aérea</option>
+								<option value="carbono_subterranea" disabled>Biomasa Subterránea</option>
+								<option value="carbono_tocones">Madera Muerta (árboles muertos en pie, tocones y Material Leñoso Caído)</option>
+								<option value="carbono_hojarasca" disabled>Hojarasca</option>
+								<option value="carbono_organica_suelo" disabled>Materia Orgánica del Suelos</option>
+
+						</select>
+						</label>
+					</div></li>
+					
+				<li class="accordion-navigation"><a href="#panel4d" role="tab" id="panel4d-heading" aria-controls="panel4d">Nacional</a>
+					<div id="panel4d" class="content" role="tabpanel" aria-labelledby="panel4d-heading">
+						<ul class="stack button-group" id="observationGroup">
+							<label id="nationalPeriod">Período <select>
+									<option value="T1">2004-2007 (T1)</option>
+									<option value="T2">2009-2014 (T2)</option>
+							</select>
+							</label>
+							<li><a id="nationalBUR" href="#" class="button"><i class="fi-trees"></i>Reporte BUR</a></li>
+							<li><a id="nationalREDD+" href="#" class="button"><i class="fi-trees"></i>Report REDD+</a></li>
+							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Reporte Anual Forestal (FRA)</a></li>
+							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Niveles de Referencia de Emisiones (NRE)</a></li>
+						</ul></li>
+			</ul>
+			<p>
+				<img src="{{ url_for('static', filename='images/banner_pg_sistema.png') }}" />
+			</p>
+		</div>
+	</div>
+	
+	
+	<!-- General footer elements  -->
+	<footer class="row">
+		<div class="large-12 columns">
+			<hr />
+			<div class="row">
+				<div class="large-6 columns">
+					<p>© Copyright.</p>
+				</div>
+				<div class="large-6 columns">
+					<ul class="inline-list right">
+						<li><a href="#">Soporte</a></li>
+						<li><a href="#">Documentación</a></li>
+
+					</ul>
+				</div>
+			</div>
+		</div>
+	</footer>
+	
+	<script src="{{ url_for('static', filename='js/vendor/jquery.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/dataTables.foundation.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation.min.js') }}"></script>
+	
+	<script src="{{ url_for('static', filename='js/sinamef_definitions.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/sinamef.js') }}"></script>
+
+	<script>
+		$(document).foundation();
+	</script>
+</body>
+</html>
