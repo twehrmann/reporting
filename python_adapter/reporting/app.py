@@ -8,7 +8,8 @@ Created on Jul 22, 2015
 
 from flask import Flask, abort, url_for, Response, request
 import os, json
-from models.models import get_view_object, get_metadata_single_table
+from models.models import  get_metadata_single_table, get_all_udm_count,\
+    get_all_observation_count, get_all_observations
 
 from flask_sqlalchemy import SQLAlchemy
 from tools.cross_domain import crossdomain
@@ -18,17 +19,19 @@ from flask.ext.log import Logging
 
 from views import view_observations, view_single_observations, view_single_udm, \
     view_all_udm, view_strata, makeHtmlTable, view_metadata, view_metadata_table, \
-    view_udm
+    view_udm, view_national
 from config import getConfig
 from tools.output_formats import makeJsonResponse, makeHtmlReponse, \
     makeExcelResponse, ExcelReport
 from tools.table_names import getObservationTable, getUdmTable, getStrataTables, \
-    getUdmBiomasaTables
+    getUdmBiomasaTables, getNationalTables
 import time
 import datetime
 from tools.r_calculation import code, BASE, CARBONO5, DCARBONO, BIOMASA, \
     RECUPERATION, FEFA
 from collections import OrderedDict
+from flask.templating import render_template
+from tools.converter import url2Dict
 
 
 config = getConfig()
@@ -44,97 +47,6 @@ manager = Manager(app)
 
 db = SQLAlchemy()
 db.init_app(app)
-
-
-@app.route('/reports.<resource_format>')
-def list_reports(resource_format):
-    engine = db.get_engine(app)
-
-    report_overview = dict()
-    report_overview["categories"] = dict()
-    report_overview["categories"]["level"] = list()
-    report_overview["categories"]["stock"] = list()
-    report_overview["categories"]["lcc"] = list()
-    report_overview["categories"]["module"] = list()
-    report_overview["categories"]["cycle"] = list()
-    
-    report_overview["niveles"] = dict()
-    report_overview["niveles"]["Observación"] = {"order":0, "title":"Observación", "description":"Aquí se muestran las estimaciones de carbono de los individuos (árboles, muertos en pie, tocones, etc) medidos en el INFyS."}
-    report_overview["niveles"]["Unidad de muestreo"] = {"order":1, "title":"Unidad de muestreo", "description":"En este nivel de reporte se agrega las estimaciones de carbono a nivel de la unidad de muestro de cada variable (arbolado vivo, MLC, hojarasca, suelo)"}
-    report_overview["niveles"]["Estrato"] = {"order":2, "title":"Estrato", "description":"Los estratos corresponden a los esquemas de clasificación al cual se desean obtener los Factores de Emisión (MAD-Mex, INEGI agregado)"}
-    report_overview["niveles"]["Nacional"] = {"order":3, "title":"Nacional", "description":"Esquemas de reporte a nivel nacional: INEGEI, FRA, REDD+, etc"}
-    
-    report_overview["niveles"]["Observación"]["level"] = "observation"
-    report_overview["niveles"]["Observación"]["stocks"] = dict()
-    report_overview["niveles"]["Observación"]["stocks"]["Arbolado vivo"] = {"order":0, "var":"carbono_arboles"}
-    report_overview["niveles"]["Observación"]["stocks"]["Arboles muertos en pie"] = {"order":1, "var":"carbono_muertospie"}
-    report_overview["niveles"]["Observación"]["stocks"]["Tocones"] = {"order":2, "var":"carbono_tocones"}
-    report_overview["niveles"]["Observación"]["stocks"]["Hojarasca"] = {"order":3, "var":"NA"}
-    report_overview["niveles"]["Observación"]["stocks"]["Suelos"] = {"order":4, "var":"NA"}
-    
-    report_overview["niveles"]["Unidad de muestreo"]["level"] = "sitio"
-    report_overview["niveles"]["Unidad de muestreo"]["stocks"] = dict()
-    report_overview["niveles"]["Unidad de muestreo"]["stocks"]["Arbolado vivo"] = {"order":0, "var":"carbono_arboles"}
-    report_overview["niveles"]["Unidad de muestreo"]["stocks"]["Arboles muertos en pie"] = {"order":1, "var":"carbono_muertospie"}
-    report_overview["niveles"]["Unidad de muestreo"]["stocks"]["Tocones"] = {"order":2, "var":"carbono_tocones"}
-    report_overview["niveles"]["Unidad de muestreo"]["stocks"]["MLC"] = {"order":3, "var":"NA"}
-    report_overview["niveles"]["Unidad de muestreo"]["stocks"]["Hojarasca"] = {"order":4, "var":"NA"}
-    report_overview["niveles"]["Unidad de muestreo"]["stocks"]["Suelos"] = {"order":5, "var":"NA"}
-    
-    report_overview["niveles"]["Estrato"]["level"] = "strata"
-    report_overview["niveles"]["Estrato"]["stocks"] = dict()
-    report_overview["niveles"]["Estrato"]["stocks"]["Arbolado vivo"] = {"order":0, "var":"carbono_arboles"}
-    report_overview["niveles"]["Estrato"]["stocks"]["Arboles muertos en pie"] = {"order":1, "var":"carbono_muertospie"}
-    report_overview["niveles"]["Estrato"]["stocks"]["Tocones"] = {"order":2, "var":"carbono_tocones"}
-    report_overview["niveles"]["Estrato"]["stocks"]["MLC"] = {"order":3, "var":"NA"}
-    report_overview["niveles"]["Estrato"]["stocks"]["Hojarasca"] = {"order":4, "var":"NA"}
-    report_overview["niveles"]["Estrato"]["stocks"]["Suelos"] = {"order":5, "var":"NA"}
-    
-    report_overview["niveles"]["Estrato"]["subcategory"] = dict()
-    report_overview["niveles"]["Estrato"]["subcategory"]["TF:TF"] = {"title":"Tierras Forestales convertidas en Tierras Forestales", "module":"dcarbono"}
-    report_overview["niveles"]["Estrato"]["subcategory"]["TFd:TF"] = {"title":"Tierras Forestales  degradadas convertidas en Tierras Forestales", "module":"recup"}
-    report_overview["niveles"]["Estrato"]["subcategory"]["TF:TFd"] = {"title":"Tierras Forestales convertidas en Tierras Forestales degradadas", "module":"degrad"}
-    report_overview["niveles"]["Estrato"]["subcategory"]["TF:OT"] = {"title":"Tierras Forestales convertidas en Otras Tierras", "module":"carbono5"}
-    report_overview["niveles"]["Estrato"]["subcategory"]["OT:TF"] = {"title":"Otras Tierras convertidas en Tierras Forestales", "module":"carbono5"}
-    
-    report_overview["niveles"]["Estrato"]["stratification"] = dict()
-    report_overview["niveles"]["Estrato"]["stratification"]["BUR"] = {"title":"INEGI (Agrupado en las clases del BUR)", "lcc":"BUR"}
-    report_overview["niveles"]["Estrato"]["stratification"]["FRA"] = {"title":"INEGI (Agrupado en las clases del BUR)", "lcc":"FRA"}
-    report_overview["niveles"]["Estrato"]["stratification"]["MADMEX"] = {"title":"Madmex 32 clases", "lcc":"MADMEX"}
-    report_overview["niveles"]["Estrato"]["stratification"]["INEGI@MADMEX"] = {"title":"INEGI (Agrupado en las clases del MADMEX)", "lcc":"INEGI"}
-    
-    report_overview["niveles"]["Estrato"]["period"] = dict()
-    report_overview["niveles"]["Estrato"]["period"]["T1"] = {"title":"2004-2007"}
-    report_overview["niveles"]["Estrato"]["period"]["T2"] = {"title":"2009-2014"}
-    
-    report_overview["niveles"]["Nacional"]["subcategory"] = dict()
-    report_overview["niveles"]["Nacional"]["subcategory"]["BUR"] = {"title":"Inventario Nacional  de Gases de Efecto Invernadero en el sector de Uso de Suelo y Cambio de Uso de Suelo (INGEI-USCUS) en las categorías Tierras Forestales, Praderas y Deforestación", "enabled":True}
-    report_overview["niveles"]["Nacional"]["subcategory"]["REDD+"] = {"title":"Reporte REDD+", "enabled":True}
-    report_overview["niveles"]["Nacional"]["subcategory"]["FRA"] = {"title":"Reporte Anual Forestal (FRA)", "enabled":False}
-    report_overview["niveles"]["Nacional"]["subcategory"]["NRE"] = {"title":"Niveles de Referencia de Emisiones (NRE)", "enabled":False}
-    
-    table_data = get_view_object(engine, "v_lcc")
-    for item in table_data:
-        report_overview["categories"]["lcc"].append(item[0])
-        
-    table_data = get_view_object(engine, "v_levels")
-    for item in table_data:
-        report_overview["categories"]["level"].append(item[0])
-        
-    table_data = get_view_object(engine, "v_modules")
-    for item in table_data:
-        report_overview["categories"]["module"].append(item[0])
-        
-    table_data = get_view_object(engine, "v_stock_types")
-    for item in table_data:
-        report_overview["categories"]["stock"].append(item[0])
-    
-      
-    json_response = json.dumps(report_overview)
-    response = Response(json_response, content_type='application/json; charset=utf-8')
-    response.headers.add('content-length', len(json_response))
-    response.status_code = 200
-    return response
 
 
 @app.route('/report/observation/T<int:cycle>.<resource_format>')
@@ -259,7 +171,7 @@ def single_udm(strata_type, cycle, stock, resource_format):
     else:
         abort(404)
                
-@app.route('/report/strata/<subcategory>/<strata_type>/T<int:cycle>/<stock>.<resource_format>')
+@app.route('/report/strata/<subcategory>/<strata_type>/T<int:cycle>/<stock>.<resource_format>', methods=['GET'])
 @crossdomain(origin='*')
 def single_strata(subcategory, strata_type, cycle, stock, resource_format):
     view_mode = request.args.get('mode')
@@ -283,6 +195,28 @@ def single_strata(subcategory, strata_type, cycle, stock, resource_format):
     else:
         abort(404)
         
+@app.route('/report/national/<strata_type>/T<int:cycle>.<resource_format>', methods=['GET'])
+@crossdomain(origin='*')
+def national_report(strata_type, cycle, resource_format):
+    engine = db.get_engine(app)
+    cycle = "T%d" % cycle
+    
+    obs = view_national(engine, strata_type, cycle)
+    
+    if len(obs) > 0:
+        if resource_format == "json":
+            return makeJsonResponse(obs)
+        elif resource_format == "html":
+            return makeHtmlReponse(makeHtmlTable(obs))
+        elif resource_format == "xls":
+            db_schema, tablename = getNationalTables(strata_type, cycle)
+            excel = ExcelReport()
+            excel.filename = "reporte_nivel_strata"
+            excel.metadata = get_metadata_single_table(engine, db_schema, tablename)
+            excel.setSource(cycle)
+            return makeExcelResponse(obs, excel)
+    else:
+        abort(404)
 
 @app.route('/report/version.html')
 @crossdomain(origin='*')
@@ -304,28 +238,36 @@ def get_metadata_table_report(tablename):
     else:
         abort(404)
    
+
+def get_siteEndpoints():
+    output = []
+    variables_examples =  getConfig()["BASE"]["EXAMPLE_URLS"]
+    variables_documentation = getConfig()["BASE"]["DOCUMENTATION_URLS"]
+        
+    for rule in app.url_map.iter_rules():
+        documentation = list()
+        
+        options = {}
+        for arg in rule.arguments:
+            print "ARG:",arg
+            options[arg] = variables_examples[arg]
+            documentation.append({arg:variables_documentation[arg]})
+
+        print "URL",url_for(rule.endpoint, **options)
+        url = url_for(rule.endpoint, _external=True, **options)
+        output.append((rule.endpoint, url, documentation))
+        
+    return output
+
 @app.route("/")
 @manager.command
 def site_map():
     h = HTML()
-    output = []
-    variables_examples =  getConfig()["BASE"]["EXAMPLE_URLS"]
-    variables_documentation = getConfig()["BASE"]["DOCUMENTATION_URLS"]
     
-    for rule in app.url_map.iter_rules():
-        documentation = list()
-        options = {}
-        for arg in rule.arguments:
-            print "V",arg
-            options[arg] = variables_examples[arg]
-            documentation.append({arg:variables_documentation[arg]})
 
-        print url_for(rule.endpoint, **options)
-        url = url_for(rule.endpoint, _external=True, **options)
-        output.append((rule.endpoint, url, documentation))
 
     with h.ul as l:
-        for line in sorted(output):
+        for line in sorted(get_siteEndpoints()):
             l.li("[%s]: %s: %s" % (line[0], line[1], line[2]))
             l.a
         
@@ -367,6 +309,55 @@ def calculate_reports():
     
     return str(h)
 
+@app.route('/SINAMEF/')
+def webui(name=None):
+    return render_template('sistema.html', name=name)
+
+@app.route('/SINAMEF/datatable', methods=[ 'POST'])
+def dataTableInterface(name=None):
+    data = request.data
+ 
+    draw_counter = int(float(url2Dict(data)[u"draw"][0]))
+    source = url2Dict(data)[u"sourceResource"][0]
+
+    if "report/udm/T" in source:
+        cycle =url2Dict(data)[u"cycle"][0]
+        view_mode=url2Dict(source)[u"mode"][0]
+        a=int(float(url2Dict(data)[u"start"][0]))
+        b=int(float(url2Dict(data)[u"length"][0]))
+                
+        engine = db.get_engine(app)
+        row_counter = get_all_udm_count(engine, cycle)
+        obs = obs = view_all_udm(engine, (a,b),cycle, mode=view_mode)
+        
+        return makeJsonResponse(obs, totalRecords=row_counter, draw=draw_counter)
+    
+    elif "report/observation/T" in source:
+        cycle =url2Dict(data)[u"cycle"][0]
+        view_mode=url2Dict(source)[u"mode"][0]
+        a=int(float(url2Dict(data)[u"start"][0]))
+        b=int(float(url2Dict(data)[u"length"][0]))
+                
+        engine = db.get_engine(app)
+        row_counter = get_all_observation_count(engine, cycle)
+        obs = view_observations(engine, cycle, (a, b), mode=view_mode)
+        
+        return makeJsonResponse(obs, totalRecords=row_counter, draw=draw_counter)
+    
+    elif "report/national/" in source:
+        cycle =url2Dict(data)[u"cycle"][0]
+        strata_type=url2Dict(data)[u"strata_type"][0]
+                
+        engine = db.get_engine(app)
+        row_counter = get_all_observation_count(engine, cycle)
+        obs = view_national(engine, strata_type, cycle)
+        
+        return makeJsonResponse(obs, totalRecords=row_counter, draw=draw_counter)
+    
+    else:
+        print "Not supported..."
+        print url2Dict(data)[u"sourceResource"][0]
+        return json.dumps(dict({"error":"Not supported: %s" % source}))
 
 if __name__ == '__main__':
     app.logger.info("Starting web interface to REDD+ reports...")

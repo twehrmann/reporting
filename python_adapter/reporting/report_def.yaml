@@ -48,6 +48,10 @@ BASE_TABLES_UDM:
 TABLES_UDM_BIOMASA:
     estrato: "fe_bm_estrato_sitio_%s_%s"
     sum: "fe_bm_sum_sitio_%s_%s"
+    
+TABLES_NATIONAL:
+    bur: fefa_ipcc_abs_s2s3_bur
+    redd: fefa_ipcc_abs_s2s3_madmex
 
 BASE_TABLES_OBS:
     T1: calculo_20150721_reporte_nivel_observacion_estimacion_t1_v20
@@ -62,7 +66,8 @@ STRATA_DEFINITION:
 
 OBS_COLUMN_MAPPER:
     arbolado_vivo:
-        - id_unidad_muestreo
+        - numero_conglomerado
+        - seccion_infys
         - numero_arbol
         - carbono_aereo_estimado
 
@@ -74,24 +79,48 @@ UDM_COLUMN_MAPPER:
         - carbono_raices
         - carbono_muertos_pie
         - carbono_tocones
+        - tallos_totales
+    vivos:
+        - id_unidad_muestreo
+        - numero_conglomerado        
+        - numero_especies_existentes
+        - biomasa_vivos
+        - carbono_vivos
+        - individuos_vivos
+        - tallos_totales
+    tocones:
+        - id_unidad_muestreo
+        - numero_conglomerado   
+        - numero_especies_existentes
+        - biomasa_tocones
+        - carbono_tocones
+        - individuos_tocones
+        - tallos_totales
+    raices:
+        - id_unidad_muestreo
+        - numero_conglomerado   
+        - numero_especies_existentes
+        - biomasa_raices
+        - carbono_raices
+        - carbono_raices
+        - tallos_totales
+    muertos_pie:
+        - id_unidad_muestreo
+        - numero_conglomerado   
+        - numero_especies_existentes
+        - biomasa_muertos_pie
+        - carbono_muertos_pie
+        - individuos_muertos_pie
+        - tallos_totales
+
         
 UDM_BIOMASA_MAPPER:
-    carbono:
-        -id
+    short:
         - Estrato
-        - TotUMPreal
-        - SumYi
-        - SumAi
-        - SumYi2
-        - SumYiAi
-        - SumAi2
-        - PromAi
-        - madmex_05
-        - inegi_s4
-        - f
-        - EstRasonHa
-        - VarEstRasonHa
-        - U
+        - nCong
+        - nSit
+        - ER_Carboles
+        - U_Carboles
 
 STRATA_COLUMN_MAPPER:
     short:
@@ -103,11 +132,9 @@ STRATA_COLUMN_MAPPER:
         - U
     degrad:
         - Estrato
-        - numero
         - parametro
-        - ER
         - Ulwr
-        - Uuwr
+        - Uupr
 
 EXCEL_FORMAT:
     stocks:

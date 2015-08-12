@@ -11,12 +11,13 @@ from flask.ext.log import Logging
 
 from models.models import get_all_observations, \
     get_udm_observations, get_udm, get_all_udm, get_strata, get_all_metadata,\
-    get_metadata_single_table, get_biomasa_udm
+    get_metadata_single_table, get_biomasa_udm, get_national
     
 from html import HTML
 from config import getConfig, OBS_COLUMN_MAPPER, UDM_COLUMN_MAPPER,\
     STRATA_COLUMN_MAPPER, UDM_BIOMASA_MAPPER
 from tools.converter import transformStructure
+from tools.table_names import DB_SCHEMA
 
 
 app = Flask(__name__)
@@ -30,7 +31,7 @@ with app.app_context():
 
 
 def view_observations(engine, cycle, (a, b), mode=None):
-    app.logger.info("OBSERVATION VIEW for %s between %s:%s" % (cycle, a, b))
+    app.logger.info("OBSERVATION VIEW for %s between %s:%s [%s]" % (cycle, a, b, mode))
     if mode not in OBS_COLUMN_MAPPER.keys():
         mode = None
     obs = get_all_observations(engine,cycle,  a, b)
@@ -53,13 +54,14 @@ def view_single_udm(engine, udm_id,cycle, mode=None):
 
 
 def view_all_udm(engine, (a,b),cycle, mode=None):
+    app.logger.info("UDM VIEW for %s between %s:%s [%s]" % (cycle, a, b, mode))
     if mode not in UDM_COLUMN_MAPPER.keys():
         mode = None
     obs=get_all_udm(engine, (a,b), cycle)
     return transformStructure(obs, mode, UDM_COLUMN_MAPPER)
 
 def view_udm(engine, strata_type, cycle, stock, mode):
-    if mode not in STRATA_COLUMN_MAPPER.keys():
+    if mode not in UDM_BIOMASA_MAPPER.keys():
         mode = None
     
     obs=get_biomasa_udm(engine, strata_type, cycle, stock)
@@ -73,12 +75,17 @@ def view_strata(engine, subcategory, strata_type, cycle, stock, mode):
     obs=get_strata(engine, subcategory, strata_type, cycle, stock)
     return transformStructure(obs, mode, STRATA_COLUMN_MAPPER)
 
+def view_national(engine, strata_type, cycle):
+        
+    obs=get_national(engine, strata_type, cycle)
+    return transformStructure(obs, None, STRATA_COLUMN_MAPPER)
+
 def view_metadata(engine):
     metadata=get_all_metadata(engine)
     return transformStructure(metadata, None, None)
 
 def view_metadata_table(engine,tablename):
-    metadata=get_metadata_single_table(engine, tablename)
+    metadata=get_metadata_single_table(engine, DB_SCHEMA, tablename)
     return transformStructure(metadata, None, None)
 
 

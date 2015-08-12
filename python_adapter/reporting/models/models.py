@@ -16,7 +16,7 @@ from sqlalchemy.exc import NoSuchTableError
 
 from config import getConfig
 from tools.table_names import getObservationTable, getUdmTable,\
-    getStrataTables, getMetadataTable, getUdmBiomasaTables
+    getStrataTables, getMetadataTable, getUdmBiomasaTables, getNationalTables
 
 config = getConfig()
 
@@ -77,9 +77,17 @@ def get_all_observations(engine, cycle, limit_a=0, limit_b=100):
 
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
-        return mapping.slice(limit_a, limit_b).all()
+        return mapping.slice(limit_a, limit_a+limit_b).all()
     else:
         return list()
+    
+def get_all_observation_count(engine, cycle):
+    schema_name, table_name = getObservationTable(cycle)
+    mapping = readTable(engine, schema_name, table_name)
+    if mapping != None:
+        return mapping.count()
+    else:
+        return 0
 
 def get_udm_observations(engine, cycle, udm_id):
     schema_name, table_name = getObservationTable(cycle)
@@ -100,10 +108,19 @@ def get_udm(engine, udm_id, cycle):
 def get_all_udm(engine, (limit_a, limit_b), cycle):
     schema_name, table_name = getUdmTable(cycle)
     mapping = readTable(engine, schema_name, table_name)
+
     if mapping != None:
-        return mapping.slice(limit_a, limit_b).all()
+        return mapping.slice(limit_a, limit_a+limit_b).all()
     else:
         return list()
+    
+def get_all_udm_count(engine, cycle):
+    schema_name, table_name = getUdmTable(cycle)
+    mapping = readTable(engine, schema_name, table_name)
+    if mapping != None:
+        return mapping.count()
+    else:
+        return 0
     
 def get_biomasa_udm(engine, strata_type, cycle, stock):
     schema_name, table_name = getUdmBiomasaTables(strata_type, cycle, stock)
@@ -122,6 +139,16 @@ def get_strata(engine, subcategory, strata_type, cycle, stock):
         return mapping.all()
     else:
         return list()
+    
+def get_national(engine, strata_type,cycle):
+    schema_name, table_name = getNationalTables(strata_type, cycle)
+    
+    mapping = readTable(engine, schema_name, table_name)
+    if mapping != None:
+        return mapping.filter(mapping.Dinamica!= None).all()
+    else:
+        return list()
+
     
 def get_all_metadata(engine):
     schema_name, table_name = getMetadataTable()

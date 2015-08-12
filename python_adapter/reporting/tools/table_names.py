@@ -15,6 +15,7 @@ CYCLES_OBS = config["BASE_TABLES_OBS"]
 
 def getObservationTable(cycle):
     if cycle not in CYCLES_OBS.keys():
+        print cycle, "missing..."
         raise Exception("Cycle %s not defined" % cycle)
     
     table_name = CYCLES_OBS[cycle]
@@ -53,6 +54,13 @@ def getStrataTables(subcategory, strata_type, cycle, stock):
         raise Exception("No table mapped to %s,%s,%s,%s" % (subcategory, strata_type, cycle, stock))
     
     return  schema_name, table_name
+
+def getNationalTables(strata_type, cycle):
+    schema_name = config["DB_SCHEMA_RESULTS"]
+    table_name = config["TABLES_NATIONAL"][strata_type]
+    
+    return  schema_name, table_name
+    
 
 def getMetadataTable():
     schema_name = config["DB_SCHEMA_RESULTS"]

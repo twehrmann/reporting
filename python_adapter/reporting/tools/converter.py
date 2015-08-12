@@ -10,6 +10,7 @@ import collections
 import datetime
 from config import getConfig
 import decimal
+import urlparse
 
 
 config = getConfig()
@@ -50,6 +51,8 @@ def sqlAlchemy2Dict(obj, shortenString=False):
         return structure
     
 def transformStructure(obs, mode, translation, shortenString=False):
+    print "MODE:",mode
+    
     structure = list()
     if len(obs) > 0:
         if mode != None:
@@ -65,4 +68,16 @@ def transformStructure(obs, mode, translation, shortenString=False):
     else:
         return None
 
+def url2Dict(urlParams):
+    urlSplit = urlParams.split("?")
+    print "XX", len(urlSplit), urlSplit
+    if len(urlSplit) == 2:
+        paramDict = dict()
+        for item in urlSplit[1:]:
+            for p in item.split("&"):
+                key,value = p.split("=")
+                paramDict[key]=value
+        return paramDict
+    else:
+        return urlparse.parse_qs(urlParams)
 

@@ -12,6 +12,7 @@ import xlsxwriter
 import StringIO
 import datetime
 from config import getConfig
+import collections
 
 config = getConfig()
 
@@ -62,9 +63,24 @@ class ExcelReport(object):
         
 
  
-def makeJsonResponse(data):
-    json_response = json.dumps(data)
-    response = Response(json_response, content_type='application/json; charset=utf-8')
+def makeJsonResponse(data, totalRecords=-1, draw=1):
+    outputStruct = dict()
+    outputStruct["draw"]=draw
+    if totalRecords == -1:
+        outputStruct["recordsTotal"]=len(data)-1
+        outputStruct["recordsFiltered"]=len(data)-1
+    else:
+        outputStruct["recordsTotal"]=totalRecords
+        outputStruct["recordsFiltered"]=totalRecords
+    
+    outputStruct["data"]=list()
+
+    for item in data[1:]:
+        outputStruct["data"].append(item)
+        
+    json_response = json.dumps(outputStruct, sort_keys=True)
+
+    response = Response(json_response, content_type='application/json')
     response.headers.add('Content-length', len(json_response))
     response.status_code = 200
 
