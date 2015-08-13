@@ -18,10 +18,14 @@ else:
     sys.exit(2)
 
 def getConfig(configFile=CONFIG):
-    with open(configFile, 'r') as stream:
-        return yaml.load(stream, Loader=Loader)
+    configStructure = dict()
     
-    return dict()
+    with open(configFile, 'r') as stream:
+        configStructure= yaml.load(stream, Loader=Loader)
+    
+    
+    configStructure["BASE"]["R_BASE"] = os.getenv('R_REPORTING_DIR', configStructure["BASE"]["R_BASE"])
+    return configStructure
 
    
 
@@ -66,4 +70,5 @@ def main():
     print getConfig()
 
 if __name__ == '__main__':
+    print CONFIG
     main()
