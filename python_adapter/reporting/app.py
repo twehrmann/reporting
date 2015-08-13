@@ -32,6 +32,7 @@ from tools.r_calculation import code, BASE, CARBONO5, DCARBONO, BIOMASA, \
 from collections import OrderedDict
 from flask.templating import render_template
 from tools.converter import url2Dict
+from flask.helpers import send_from_directory
 
 
 config = getConfig()
@@ -308,6 +309,11 @@ def calculate_reports():
     print "Processing time: %s" % str(time.time() - start)
     
     return str(h)
+
+@app.route('/robots.txt')
+@app.route('/sitemap.xml')
+def static_from_root():
+    return send_from_directory(app.static_folder, request.path[1:])
 
 @app.route('/SINAMEF/')
 def webui(name=None):
