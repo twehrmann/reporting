@@ -6,7 +6,12 @@ library(logging)
 basicConfig()
 
 library(yaml)
-config = yaml.load_file("/Volumes/SSD2go_tw/conafor/reporting/config/database.yml")
+CONFIG <- Sys.getenv("R_REPORTING_CONFIG")
+if (CONFIG=="") {
+  CONFIG="/Volumes/SSD2go_tw/conafor/reporting/config/database.yml"
+} 
+
+config = yaml.load_file(CONFIG)
 OUTPUT_PATH = config$results$output_dir
 DB_SCHEME=config$results$db_schema
 BASE_VERSION = config$results$base_model_version
