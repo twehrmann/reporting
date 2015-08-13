@@ -6,6 +6,7 @@ flask
 Flask-Migrate
 Flask-Script
 Flask-SQLAlchemy
+flask-compress
 
 xlsxwriter
 HTML

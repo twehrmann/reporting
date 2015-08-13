@@ -33,6 +33,7 @@ from collections import OrderedDict
 from flask.templating import render_template
 from tools.converter import url2Dict
 from flask.helpers import send_from_directory
+from flask.ext.compress import Compress
 
 
 config = getConfig()
@@ -43,6 +44,7 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['FLASK_LOG_LEVEL'] = config["BASE"]["loglevel"]
 app.debug = True
 flask_log = Logging(app)
+Compress(app)
 
 manager = Manager(app)
 
