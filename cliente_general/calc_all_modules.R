@@ -1,4 +1,10 @@
-setwd("/Volumes/SSD2go_tw/conafor/reporting/cliente_general")
+CWD <- Sys.getenv("R_REPORTING_DIR")
+if (CWD=="") {
+  CWD="/Volumes/SSD2go_tw/conafor/reporting/cliente_general"
+} 
+
+setwd(CWD)
+
 source("tools.R")
 source("db_access.R")
 

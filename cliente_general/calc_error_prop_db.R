@@ -1,4 +1,3 @@
-setwd("/Volumes/SSD2go_tw/conafor/reporting/cliente_general")
 source("tools.R")
 source("db_access.R")
 source("calc_error_prop.R")
