@@ -9,15 +9,15 @@ Created on Jul 24, 2015
 from flask import Flask
 from flask.ext.log import Logging
 
-from tables.models import get_all_observations, \
+from models import get_all_observations, \
     get_udm_observations, get_udm, get_all_udm, get_strata, get_all_metadata,\
     get_metadata_single_table, get_biomasa_udm, get_national
     
 from html import HTML
-from config import getConfig, OBS_COLUMN_MAPPER, UDM_COLUMN_MAPPER,\
+from reporting.config import getConfig, OBS_COLUMN_MAPPER, UDM_COLUMN_MAPPER,\
     STRATA_COLUMN_MAPPER, UDM_BIOMASA_MAPPER
-from tools.converter import transformStructure
-from tools.table_names import DB_SCHEMA
+from reporting.tools.converter import transformStructure
+from reporting.tools.table_names import DB_SCHEMA
 
 
 app = Flask(__name__)
@@ -25,9 +25,6 @@ with app.app_context():
     # within this block, current_app points to app.
     app.config['FLASK_LOG_LEVEL'] = getConfig()["BASE"]["loglevel"]
     flask_log = Logging(app)
-
-    
-
 
 
 def view_observations(engine, cycle, (a, b), mode=None):

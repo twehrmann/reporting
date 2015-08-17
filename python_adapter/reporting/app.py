@@ -6,18 +6,23 @@ Created on Jul 22, 2015
 @author: thilo
 '''
 
-from flask import Flask, abort, url_for, Response, request
+import time
+import datetime
 import os, json
-from models.models import  get_metadata_single_table, get_all_udm_count,\
-    get_all_observation_count, get_all_observations
+from collections import OrderedDict
+
+from flask import Flask, abort, url_for, request
+
 
 from flask_sqlalchemy import SQLAlchemy
-from tools.cross_domain import crossdomain
 from html import HTML
 from flask.ext.script import Manager
 from flask.ext.log import Logging
 
-from views import view_observations, view_single_observations, view_single_udm, \
+from tables.models import  get_metadata_single_table, get_all_udm_count,\
+    get_all_observation_count
+    
+from tables.views import view_observations, view_single_observations, view_single_udm, \
     view_all_udm, view_strata, makeHtmlTable, view_metadata, view_metadata_table, \
     view_udm, view_national
 from config import getConfig
@@ -25,13 +30,14 @@ from tools.output_formats import makeJsonResponse, makeHtmlReponse, \
     makeExcelResponse, ExcelReport
 from tools.table_names import getObservationTable, getUdmTable, getStrataTables, \
     getUdmBiomasaTables, getNationalTables
-import time
-import datetime
+
+from tools.cross_domain import crossdomain
+from tools.converter import url2Dict
+
+
 from tools.r_calculation import code, BASE, CARBONO5, DCARBONO, BIOMASA, \
     RECUPERATION, FEFA
-from collections import OrderedDict
 from flask.templating import render_template
-from tools.converter import url2Dict
 from flask.helpers import send_from_directory
 from flask.ext.compress import Compress
 

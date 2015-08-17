@@ -8,7 +8,7 @@ from sqlsoup import TableClassType
 
 import collections
 import datetime
-from config import getConfig
+from reporting.config import getConfig
 import decimal
 import urlparse
 

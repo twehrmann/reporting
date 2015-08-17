@@ -1,6 +1,6 @@
 eclipse.preferences.version=1
 encoding//reporting/app.py=utf-8
-encoding//reporting/models/models.py=utf-8
+encoding//reporting/tables/models.py=utf-8
+encoding//reporting/tables/views.py=utf-8
 encoding//reporting/tools/datatable.py=utf-8
 encoding//reporting/tools/output_formats.py=utf-8
-encoding//reporting/views.py=utf-8

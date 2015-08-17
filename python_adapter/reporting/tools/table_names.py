@@ -3,7 +3,7 @@ Created on Aug 5, 2015
 
 @author: thilo
 '''
-from config import getConfig
+from reporting.config import getConfig
 
 config = getConfig()
 

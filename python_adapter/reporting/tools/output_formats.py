@@ -11,8 +11,7 @@ import json
 import xlsxwriter
 import StringIO
 import datetime
-from config import getConfig
-import collections
+from reporting.config import getConfig
 
 config = getConfig()
 

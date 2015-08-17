@@ -15,12 +15,12 @@ import sqlsoup
 from sqlalchemy.exc import NoSuchTableError
 
 from reporting.config import getConfig
-from tools.table_names import getObservationTable, getUdmTable,\
-    getStrataTables, getMetadataTable, getUdmBiomasaTables, getNationalTables
+from reporting.tools.table_names import getObservationTable, getUdmTable,\
+    getStrataTables, getMetadataTable, getUdmBiomasaTables, getNationalTables,\
+    DB_SCHEMA
 
 config = getConfig()
 
-DB_SCHEMA = config["DB_SCHEMA_RESULTS"]
 CYCLES_UDM = config["BASE_TABLES_UDM"]
 
 app = Flask(__name__)
@@ -135,6 +135,7 @@ def get_strata(engine, subcategory, strata_type, cycle, stock):
     schema_name, table_name = getStrataTables(subcategory, strata_type, cycle, stock)
     
     mapping = readTable(engine, schema_name, table_name)
+
     if mapping != None:
         return mapping.all()
     else:
