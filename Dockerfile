@@ -14,16 +14,18 @@ RUN apt-get -y install  git
 RUN apt-get update && apt-get install -y   libxml2-dev   python   build-essential   make    gcc    python-dev     locales   python-pip postgresql-server-dev-9.3
 
 #RUN dpkg-reconfigure locales && locale-gen C.UTF-8 &&   /usr/sbin/update-locale LANG=C.UTF-8
-ENV LC_ALL C.UTF-8
+#ENV LC_ALL C.UTF-8
 
 RUN apt-get -y install r-base r-base-dev python-rpy2 python-psycopg2
 
+ADD python_adapter /myapp/python_adapter
+ADD cliente_general /myapp/cliente_general
 ENV REPORT_DEF /myapp/python_adapter/reporting/report_def.yaml
 ENV APP_SETTINGS config.DevelopmentConfig
 ENV R_REPORTING_DIR /myapp/cliente_general
 ENV R_REPORTING_CONFIG /myapp/config/database.yml
-
-RUN git clone https://github.com/twehrmann/reporting.git /myapp
+ENV PYTHONPATH $PYTHONPATH:/myapp/python_adapter/
+#RUN git clone https://github.com/twehrmann/reporting.git /myapp
 WORKDIR /myapp/cliente_general
 RUN Rscript requirements.R
 
