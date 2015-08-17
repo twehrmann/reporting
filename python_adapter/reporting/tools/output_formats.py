@@ -43,7 +43,6 @@ class ExcelReport(object):
             raise Exception ("Column %s of %s not in defined columns: %s" % (column, self.metadata.module, str(self.getColumns())))
     
     def setSource(self, cycle=None):
-        print "XXX",cycle, self.metadata.module, self.base[self.metadata.module]["source"]
         if self.base[self.metadata.module] == None:
             raise Exception("No Excel description found for file: %s"%self.filename)
         if "%" in self.base[self.metadata.module]["source"]:

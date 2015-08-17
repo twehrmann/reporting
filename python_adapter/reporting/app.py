@@ -63,6 +63,9 @@ def observation_json(cycle, resource_format):
     engine = db.get_engine(app)
     obs = view_observations(engine, "T%d" % cycle, (a, b), view_mode)
     
+    if obs == None:
+        abort(404)
+    
     if resource_format == "json":
         return makeJsonResponse(obs)
     elif resource_format == "html":
@@ -88,6 +91,9 @@ def observation_udm_json(cycle, udm_id, resource_format):
     engine = db.get_engine(app)
     obs = view_single_observations(engine, "T%d" % cycle, udm_id, mode=view_mode)
     
+    if obs == None:
+        abort(404)
+    
     if obs != None:
         if resource_format == "json":
             return makeJsonResponse(obs)
@@ -110,6 +116,9 @@ def single_udm_json(cycle, id, resource_format):
     view_mode = request.args.get('mode')
     engine = db.get_engine(app)
     obs = view_single_udm(engine, id, "T%d" % cycle, view_mode)
+    
+    if obs == None:
+        abort(404)
     
     if obs != None:
         if resource_format == "json":
@@ -136,6 +145,9 @@ def all_udm_json(cycle, resource_format):
     engine = db.get_engine(app)
     obs = view_all_udm(engine, (a, b), cycle, view_mode)
     
+    if obs == None:
+        abort(404)
+    
     if len(obs) > 0:
         if resource_format == "json":
             return makeJsonResponse(obs)
@@ -158,6 +170,9 @@ def single_udm(strata_type, cycle, stock, resource_format):
     engine = db.get_engine(app)
     cycle = "T%d" % cycle
     obs = view_udm(engine, strata_type, cycle, stock, view_mode)
+    
+    if obs == None:
+        abort(404)
 
     if len(obs) > 0:
         if resource_format == "json":
@@ -182,6 +197,9 @@ def single_strata(subcategory, strata_type, cycle, stock, resource_format):
     cycle = "T%d" % cycle
     
     obs = view_strata(engine, subcategory, strata_type, cycle, stock, view_mode)
+
+    if obs == None:
+        abort(404)
     
     if len(obs) > 0:
         if resource_format == "json":
@@ -205,6 +223,9 @@ def national_report(strata_type, cycle, resource_format):
     cycle = "T%d" % cycle
     
     obs = view_national(engine, strata_type, cycle)
+    
+    if obs == None:
+        abort(404)
     
     if len(obs) > 0:
         if resource_format == "json":
@@ -252,11 +273,9 @@ def get_siteEndpoints():
         
         options = {}
         for arg in rule.arguments:
-            print "ARG:",arg
             options[arg] = variables_examples[arg]
             documentation.append({arg:variables_documentation[arg]})
 
-        print "URL",url_for(rule.endpoint, **options)
         url = url_for(rule.endpoint, _external=True, **options)
         output.append((rule.endpoint, url, documentation))
         
@@ -266,8 +285,6 @@ def get_siteEndpoints():
 @manager.command
 def site_map():
     h = HTML()
-    
-
 
     with h.ul as l:
         for line in sorted(get_siteEndpoints()):
@@ -312,6 +329,7 @@ def calculate_reports():
     
     return str(h)
 
+@app.route('/favicon.ico')
 @app.route('/robots.txt')
 @app.route('/sitemap.xml')
 def static_from_root():
@@ -319,32 +337,46 @@ def static_from_root():
 
 @app.route('/SINAMEF/')
 def webui(name=None):
-    return render_template('sistema.html', name=name)
+    table_structure = dict()
+    for modules in [k for k in config["EXCEL_FORMAT"].keys() if k not in ["stocks"]]:
+        table_structure[modules] = dict()
+        table_structure[modules]["title"]=config["EXCEL_FORMAT"]["carbono5"]["title"] 
+        table_structure[modules]["columns"] = list()
+        for item in config["EXCEL_FORMAT"][modules]["columns"]:
+            k,v = item.items()[0]
+            table_structure[modules]["columns"].append( {"data":k, "title":v})
+    print table_structure.keys()
+        
+    return render_template('sistema.html', name=name, 
+                           DEFAULT_OUTPUT_FORMAT=config["BASE"]["DEFAULT_OUTPUT_FORMAT"], 
+                           table_structure=json.dumps(table_structure))
+
 
 @app.route('/SINAMEF/datatable', methods=[ 'POST'])
 def dataTableInterface(name=None):
-    data = request.data
+    request_data = url2Dict(request.data)
  
-    draw_counter = int(float(url2Dict(data)[u"draw"][0]))
-    source = url2Dict(data)[u"sourceResource"][0]
-
+    draw_counter = int(float(request_data[u"draw"][0]))
+    source = request_data[u"sourceResource"][0]
+    app.logger.info("Table source: %s"%source)
     if "report/udm/T" in source:
-        cycle =url2Dict(data)[u"cycle"][0]
-        view_mode=url2Dict(source)[u"mode"][0]
-        a=int(float(url2Dict(data)[u"start"][0]))
-        b=int(float(url2Dict(data)[u"length"][0]))
-                
+        cycle =request_data[u"cycle"][0]
+        view_mode=url2Dict(source)[u"mode"]
+        a=int(float(request_data[u"start"][0]))
+        b=int(float(request_data[u"length"][0]))
+     
         engine = db.get_engine(app)
         row_counter = get_all_udm_count(engine, cycle)
         obs = obs = view_all_udm(engine, (a,b),cycle, mode=view_mode)
+        print obs
         
         return makeJsonResponse(obs, totalRecords=row_counter, draw=draw_counter)
     
     elif "report/observation/T" in source:
-        cycle =url2Dict(data)[u"cycle"][0]
-        view_mode=url2Dict(source)[u"mode"][0]
-        a=int(float(url2Dict(data)[u"start"][0]))
-        b=int(float(url2Dict(data)[u"length"][0]))
+        cycle =request_data[u"cycle"][0]
+        view_mode=url2Dict(source)[u"mode"]
+        a=int(float(request_data[u"start"][0]))
+        b=int(float(request_data[u"length"][0]))
                 
         engine = db.get_engine(app)
         row_counter = get_all_observation_count(engine, cycle)
@@ -353,9 +385,9 @@ def dataTableInterface(name=None):
         return makeJsonResponse(obs, totalRecords=row_counter, draw=draw_counter)
     
     elif "report/national/" in source:
-        cycle =url2Dict(data)[u"cycle"][0]
-        strata_type=url2Dict(data)[u"strata_type"][0]
-                
+        cycle =request_data[u"cycle"][0]
+        strata_type=request_data[u"strata_type"][0]
+
         engine = db.get_engine(app)
         row_counter = get_all_observation_count(engine, cycle)
         obs = view_national(engine, strata_type, cycle)
@@ -363,8 +395,7 @@ def dataTableInterface(name=None):
         return makeJsonResponse(obs, totalRecords=row_counter, draw=draw_counter)
     
     else:
-        print "Not supported..."
-        print url2Dict(data)[u"sourceResource"][0]
+        app.logger.error("Resource: %s not supported" % source)
         return json.dumps(dict({"error":"Not supported: %s" % source}))
 
 if __name__ == '__main__':

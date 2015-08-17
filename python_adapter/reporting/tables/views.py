@@ -9,7 +9,7 @@ Created on Jul 24, 2015
 from flask import Flask
 from flask.ext.log import Logging
 
-from models.models import get_all_observations, \
+from tables.models import get_all_observations, \
     get_udm_observations, get_udm, get_all_udm, get_strata, get_all_metadata,\
     get_metadata_single_table, get_biomasa_udm, get_national
     
@@ -71,7 +71,7 @@ def view_udm(engine, strata_type, cycle, stock, mode):
 def view_strata(engine, subcategory, strata_type, cycle, stock, mode):
     if mode not in STRATA_COLUMN_MAPPER.keys():
         mode = None
-
+    
     obs=get_strata(engine, subcategory, strata_type, cycle, stock)
     return transformStructure(obs, mode, STRATA_COLUMN_MAPPER)
 

@@ -70,13 +70,14 @@ def transformStructure(obs, mode, translation, shortenString=False):
 
 def url2Dict(urlParams):
     urlSplit = urlParams.split("?")
-    print "XX", len(urlSplit), urlSplit
+
     if len(urlSplit) == 2:
         paramDict = dict()
         for item in urlSplit[1:]:
             for p in item.split("&"):
                 key,value = p.split("=")
                 paramDict[key]=value
+        print paramDict
         return paramDict
     else:
         return urlparse.parse_qs(urlParams)

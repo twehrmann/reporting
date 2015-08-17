@@ -1,7 +1,7 @@
 <!doctype html>
 <html class="no-js" lang="en">
 <head>
-<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sistema Nacional de Monitoreo de Emisiones Forestales (SINAMEF)</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/foundation.css') }}">
@@ -10,11 +10,12 @@
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/dataTables.foundation.css') }}">
 
 <script src="{{ url_for('static', filename='js/vendor/modernizr.js') }}"></script>
+
+
 </head>
 <body>
 	<nav class="top-bar" data-topbar>
 		<ul class="title-area">
-
 			<li class="name">
 				<h1>
 					<a href="#"> Sistema Nacional de Monitoreo de Emisiones Forestales </a>
@@ -52,12 +53,13 @@
 	<div class="row">
 		<div class="large-8 push-4 columns">
 			<table id="strata" class="display" cellspacing="0" width="100%">
-				<caption id="tableCaption"><i>Por favor marcar un reporte.</i></caption>
+				<caption id="tableCaption">
+					<i>Por favor marcar un reporte.</i>
+				</caption>
 			</table>
 
 			<ul class="inline-list right">
-				<li><a href="#"><i class="fi-page-export-csv"></i> Exportar como Excel archivo</a></li>
-
+				<li><a id="DownloadLink" href="#"><i class="fi-page-export-csv"></i> Exportar como Excel archivo</a></li>
 			</ul>
 		</div>
 		<div class="large-4 pull-8 columns">
@@ -73,17 +75,17 @@
 							</label>
 							<li><a id="ObservationAV" href="#" class="button"><i class="fi-trees"></i>Arbolado vivo</a></li>
 							<li><a id="ObservationMEP" href="#" class="button"><i class="fi-trees"></i>Arboles muertos en pie</a></li>
-							<li><a href="#" class="button"><i class="fi-trees"></i>Tocones</a></li>
+							<li><a id="ObservationT"  href="#" class="button"><i class="fi-trees"></i>Tocones</a></li>
 							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Hojarasca</a></li>
 							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Suelos</a></li>
 						</ul>
 					</div></li>
-					
+
 				<li class="accordion-navigation"><a href="#panel2d" role="tab" id="panel2d-heading" aria-controls="panel2d">Unidad de
 						Muestreo</a>
 					<div id="panel2d" class="content" role="tabpanel" aria-labelledby="panel2d-heading">
 						<ul class="stack button-group">
-						<label id="udmPeriod">Período <select>
+							<label id="udmPeriod">Período <select>
 									<option value="T1">2004-2007 (T1)</option>
 									<option value="T2">2009-2014 (T2)</option>
 							</select>
@@ -96,7 +98,7 @@
 							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Suelos</a></li>
 						</ul>
 					</div></li>
-					
+
 				<li class="accordion-navigation"><a href="#panel3d" role="tab" id="panel3d-heading" aria-controls="panel3d">Estrato</a>
 					<div id="panel3d" class="content" role="tabpanel" aria-labelledby="panel3d-heading">
 						<label>Subcategoría <select id="strataSubcategory">
@@ -125,7 +127,7 @@
 						</select>
 						</label>
 					</div></li>
-					
+
 				<li class="accordion-navigation"><a href="#panel4d" role="tab" id="panel4d-heading" aria-controls="panel4d">Nacional</a>
 					<div id="panel4d" class="content" role="tabpanel" aria-labelledby="panel4d-heading">
 						<ul class="stack button-group" id="observationGroup">
@@ -145,8 +147,8 @@
 			</p>
 		</div>
 	</div>
-	
-	
+
+
 	<!-- General footer elements  -->
 	<footer class="row">
 		<div class="large-12 columns">
@@ -165,13 +167,65 @@
 			</div>
 		</div>
 	</footer>
-	
+
 	<script src="{{ url_for('static', filename='js/vendor/jquery.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/dataTables.foundation.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/foundation.min.js') }}"></script>
+
+	<script>
+	var getUrl = window.location;
+	var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
+	var DEFAULT_OUTPUT_FORMAT = "{{DEFAULT_OUTPUT_FORMAT}}";
+
+	var FEcolumns = [];
+	var FEcolumnsDegrad = [];
+	var ObservationCarbonoAereoColumns = [];
+	var UdmVivoColumns = [];
+	var UdmMuertosColumns = [];
+	var UdmToconesColumns = [];
+	var NationalReportColumns = [];
+
+	var struct = {{table_structure|safe}};
 	
-	<script src="{{ url_for('static', filename='js/sinamef_definitions.js') }}"></script>
+	for (var col in struct["carbono5"]["columns"])
+	{
+		FEcolumns.push({"data":struct["carbono5"]["columns"][col].data, "title":struct["carbono5"]["columns"][col].title});
+	}
+	
+	for (var col in struct["base_observation_carbono_aereo"]["columns"])
+	{
+		ObservationCarbonoAereoColumns.push({"data":struct["base_observation_carbono_aereo"]["columns"][col].data, "title":struct["base_observation_carbono_aereo"]["columns"][col].title});
+	}
+	
+	for (var col in struct["base_udm_vivo"]["columns"])
+	{
+		UdmVivoColumns.push({"data":struct["base_udm_vivo"]["columns"][col].data, "title":struct["base_udm_vivo"]["columns"][col].title});
+	}
+	
+	for (var col in struct["base_udm_muertos"]["columns"])
+	{
+		UdmMuertosColumns.push({"data":struct["base_udm_muertos"]["columns"][col].data, "title":struct["base_udm_muertos"]["columns"][col].title});
+	}
+		
+	for (var col in struct["base_udm_tocones"]["columns"])
+	{
+		UdmToconesColumns.push({"data":struct["base_udm_tocones"]["columns"][col].data, "title":struct["base_udm_tocones"]["columns"][col].title});
+	}
+	for (var col in struct["refoRecu"]["columns"])
+	{
+		FEcolumnsDegrad.push({"data":struct["refoRecu"]["columns"][col].data, "title":struct["refoRecu"]["columns"][col].title});
+	}
+	
+
+	var NationalReportColumns = [{
+		"data" : "Dinamica", "title":"Dinamica"}, {
+		"data" : "Area", "title":"Area"}, {
+		"data" : "EmisionesAbsorciones", "title":"Emisiones/Absorciones"}, {
+		"data" : "U", "title":"U (%)"
+	}]
+	</script>
+
 	<script src="{{ url_for('static', filename='js/sinamef.js') }}"></script>
 
 	<script>

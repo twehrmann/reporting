@@ -1,8 +1,11 @@
 # Install everything that needs to be compiled
+# database stuff
 psycopg2
 sqlalchemy
 sqlsoup
 
+#web server stuff
+gunicorn
 flask
 Flask-Migrate
 Flask-Script
@@ -10,7 +13,11 @@ Flask-SQLAlchemy
 flask-compress
 flask-log
 
+# Output format relating stuff
 xlsxwriter
 HTML
-rpy2
 pyyaml
+
+# R related stuff
+rpy2
+

@@ -1,3 +1,9 @@
+
+$report = '';
+$cycle = 1;
+$strata_type = "";
+$UrlExcel = "";
+
 function RefreshTable(tableId, urlData) {
 	console.debug("Loading new data from " + urlData + " to fill table "
 			+ tableId);
@@ -62,7 +68,7 @@ function InitTable(tableId, columns, serverSide) {
 }
 
 function switchTable(tableId, url, columns, title, serverSide) {
-	serverSide = typeof serverSide !== 'undefined' ? serverSide : false;
+	var serverSide = typeof serverSide !== 'undefined' ? serverSide : false;
 	console.info("Switching to table:" + url + " : " + serverSide);
 
 	if ($.fn.dataTable.isDataTable(tableId)) {
@@ -72,6 +78,7 @@ function switchTable(tableId, url, columns, title, serverSide) {
 		$(tableId).empty();
 	}
 	$report = url;
+	
 
 	InitTable(tableId, columns, serverSide);
 	if (!serverSide) {
@@ -79,9 +86,17 @@ function switchTable(tableId, url, columns, title, serverSide) {
 	}
 
 	$("#tableCaption").text(title);
-
 	console.log($report);
+}
 
+function setDownloadUrl(url, format) {
+	var format = typeof format !== 'undefined' ? format : DEFAULT_OUTPUT_FORMAT;
+	var url = baseUrl + url.replace('json', format);
+
+	$("#DownloadLink").attr("href", url);
+	console.log("Downloader URL:"+url);
+	
+	$UrlExcel = url;
 }
 
 function setStrataReport() {
@@ -89,12 +104,24 @@ function setStrataReport() {
 	var deposit = $("#strataDeposit option:selected").val();
 	var stratification = $("#strataStratification option:selected").val();
 	var subcategory = $("#strataSubcategory option:selected").val();
-	columns = FEcolumns;
+	
 
-	url = "report/strata/" + subcategory + "/" + stratification + "/" + cycle
-			+ "/" + deposit + ".json?mode=short";
-	title = "Biomasa aereo nivel de UdM";
+	var url = "report/strata/" + subcategory + "/" + stratification + "/" + cycle
+			+ "/" + deposit + ".json";
+	var title = "Biomasa aereo nivel de UdM";
 	$cycle = cycle;
+	$strata_type = deposit;
+	console.log(subcategory);
+	if (subcategory == "tfd-tf"){
+		var columns = FEcolumnsDegrad;
+	} else if (subcategory == "tf-tfd"){
+		var columns = FEcolumnsDegrad;
+	} else {
+		var columns = FEcolumns;
+	}
+
+	
+	setDownloadUrl(url);
 
 	switchTable("#strata", url, columns, title, false);
 	return false;
@@ -102,22 +129,33 @@ function setStrataReport() {
 
 function setObservationReport(deposit, title) {
 	var cycle = $("#observationPeriod option:selected").val();
-	columns = ObservationCarbonoAereoColumns;
+	var columns = ObservationCarbonoAereoColumns;
 
-	url = "report/observation/" + cycle + ".json?mode=" + deposit;
-	title = title;
+	var url = "report/observation/" + cycle + ".json?mode=" + deposit;
+	$title = title;
 	$cycle = cycle;
+	$strata_type = deposit;
+	setDownloadUrl(url);
 
 	switchTable("#strata", url, columns, title, true);
 }
 
 function setUdmReport(deposit, title) {
-	var cycle = $("#observationPeriod option:selected").val();
-	columns = UdmVivoColumns;
+	var cycle = $("#udmPeriod option:selected").val();
 
-	url = "report/udm/" + cycle + ".json?a=0&b=10&mode=" + deposit;
+	if (deposit == "vivos") {
+	var columns = UdmVivoColumns;
+	} else if (deposit == "muertos_pie") {
+	var columns = UdmMuertosColumns;
+	} else if (deposit == "tocones") {
+	var columns = UdmToconesColumns;
+	}
+
+	var url = "report/udm/" + cycle + ".json?a=0&b=10&mode=" + deposit;
 	title = title;
 	$cycle = cycle;
+	$strata_type = deposit;
+	setDownloadUrl(url);
 
 	switchTable("#strata", url, columns, title, true);
 	return false;
@@ -125,12 +163,13 @@ function setUdmReport(deposit, title) {
 
 function setNationalReport(type,title) {
 	var cycle = $("#nationalPeriod option:selected").val();
-	columns = NationalReportColumns;
+	var columns = NationalReportColumns;
 
-	url = "report/national/"+type+"/" + cycle + ".json";
+	var url = "report/national/"+type+"/" + cycle + ".json";
 	title = title;
 	$cycle = cycle;
 	$strata_type = type;
+	setDownloadUrl(url);
 
 	switchTable("#strata", url, columns, title, false);
 	return false;
