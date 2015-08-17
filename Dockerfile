@@ -30,8 +30,9 @@ RUN Rscript requirements.R
 WORKDIR /myapp/python_adapter
 RUN pip install -r requirements.txt
 
-EXPOSE 5555 
+EXPOSE 5555:5555 
 
 WORKDIR /myapp/python_adapter/reporting
 #RUN python app.py
-CMD ["python app.py"]
+ENTRYPOINT ["gunicorn"]
+CMD ["-w", "4", "app:app", "-b 0.0.0.0:5555"]
