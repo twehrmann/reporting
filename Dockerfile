@@ -14,7 +14,7 @@ RUN apt-get -y install  git
 RUN apt-get update && apt-get install -y   libxml2-dev   python   build-essential   make    gcc    python-dev     locales   python-pip postgresql-server-dev-9.3
 
 #RUN dpkg-reconfigure locales && locale-gen C.UTF-8 &&   /usr/sbin/update-locale LANG=C.UTF-8
-ENV LC_ALL C.UTF-8
+#ENV LC_ALL C.UTF-8
 
 RUN apt-get -y install r-base r-base-dev python-rpy2 python-psycopg2
 
