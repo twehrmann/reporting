@@ -1,6 +1,7 @@
 # Model definitions
 DB_SCHEMA_RESULTS: client_output
 DB_SCHEMA_BASE: mssql
+DB_MADMEX_AREA_TABLE: madmex.areas_estratos_madmex
 
 BASE:
     R_BASE: /Volumes/SSD2go_tw/conafor/reporting/cliente_general/
