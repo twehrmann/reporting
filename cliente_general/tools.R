@@ -1,5 +1,5 @@
 assign("last.warning", NULL, envir = baseenv())
-options(error=recover)
+options(error=utils::dump.frames) # recover will call debugger
 
 library(WriteXLS)
 library(logging)
