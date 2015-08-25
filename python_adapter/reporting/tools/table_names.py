@@ -14,6 +14,7 @@ CYCLES_OBS = config["BASE_TABLES_OBS"]
 
 
 def getObservationTable(cycle):
+    print cycle, CYCLES_OBS.keys()
     if cycle not in CYCLES_OBS.keys():
         print cycle, "missing..."
         raise Exception("Cycle %s not defined" % cycle)

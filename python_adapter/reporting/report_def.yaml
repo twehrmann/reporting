@@ -15,7 +15,7 @@ BASE:
     float_fmt: "%.3f"
     max_string_length: 25
     DB_STRING: "postgresql://postgres:postgres.@reddbase/reporting"
-    DEFAULT_OUTPUT_FORMAT: html
+    DEFAULT_OUTPUT_FORMAT: xls
     DOCUMENTATION_URLS:
         filename: Static files like metadata catalogues
         tablename: Table name for its metadata access
@@ -309,3 +309,11 @@ EXCEL_FORMAT:
             - TotUMPreal: Area total (ha)
             - EstRasonHa: ER (tonC/ha)
             - U: U (%)
+    'factores de emision con error propagacion':
+        title: Factores de emision y absorbcion con error propagacion
+        source: "Fuente de Datos: Ciclo %s del INFyS"
+        columns:
+            - Dinamica: Dinamica
+            - Area: Area
+            - EmisionesAbsorciones: E/A
+            - U: U

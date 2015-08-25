@@ -77,7 +77,7 @@ def observation_json(cycle, resource_format):
     elif resource_format == "html":
         return makeHtmlReponse(makeHtmlTable(obs, title='Observation range id: %d - %d' % (a, b)))
     elif resource_format == "xls":
-        db_schema, tablename = getObservationTable(cycle)
+        db_schema, tablename = getObservationTable("T%d" % cycle)
         excel = ExcelReport()
         excel.filename = "reporte_nivel_observacion"
         excel.metadata = get_metadata_single_table(engine, db_schema, tablename)
@@ -93,9 +93,10 @@ def observation_json(cycle, resource_format):
 def observation_udm_json(cycle, udm_id, resource_format):
     udm_id = int(float(udm_id))
     view_mode = request.args.get('mode')
+    cycle = "T%d" % cycle
 
     engine = db.get_engine(app)
-    obs = view_single_observations(engine, "T%d" % cycle, udm_id, mode=view_mode)
+    obs = view_single_observations(engine, cycle, udm_id, mode=view_mode)
     
     if obs == None:
         abort(404)

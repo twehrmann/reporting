@@ -22,7 +22,10 @@ class ExcelReport(object):
     base = config["EXCEL_FORMAT"]
     
     def getTitle(self):
-        title = "%s (%s)" % (self.base["stocks"][self.metadata.stock_type], self.base[self.metadata.module]["title"])
+        if self.metadata.stock_type not in  self.base["stocks"].keys():
+            title = "%s" % (self.base[self.metadata.module]["title"])
+        else:
+            title = "%s (%s)" % (self.base["stocks"][self.metadata.stock_type], self.base[self.metadata.module]["title"])
         return title
     
     def getSource(self):

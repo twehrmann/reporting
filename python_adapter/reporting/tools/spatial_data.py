@@ -222,7 +222,7 @@ USAGE
         result = merge_hist(output)
         keys = result.keys()
         keys.sort()
-        print result
+
         print "* %s \t %s \t %s\t %s" % ("class", "pixels", "sqm area", "ha area")
     
         print "Result:"
