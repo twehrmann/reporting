@@ -19,6 +19,12 @@ function RefreshTable(tableId, urlData) {
 		}
 
 		oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
+		
+		$(tableId).find("th").each(function() {
+			console.log($(this));
+		    this.setAttribute( 'title', $(this).text());
+		    this.setAttribute( 'has-tip','');
+		});
 		table.fnDraw();
 	});
 }
@@ -58,7 +64,8 @@ function InitTable(tableId, columns, serverSide) {
 					d.strata_type = $strata_type;
 				},
 				"error": function (xhr, error, thrown) {
-				       alert( 'You are not logged in' );
+				       alert( 'Error occured:' );
+				       console.error(error);
 				    }
 			},
 			"columns" : columns,
@@ -83,10 +90,13 @@ function switchTable(tableId, url, columns, title, serverSide) {
 	InitTable(tableId, columns, serverSide);
 	if (!serverSide) {
 		RefreshTable(tableId, baseUrl + url);
+	} else {
+		
 	}
 
 	$("#tableCaption").text(title);
-	console.log($report);
+	
+	$(document).foundation('tooltip', 'reflow');
 }
 
 function setDownloadUrl(url, format) {
@@ -149,6 +159,8 @@ function setUdmReport(deposit, title) {
 	var columns = UdmMuertosColumns;
 	} else if (deposit == "tocones") {
 	var columns = UdmToconesColumns;
+	} else if (deposit == "raices") {
+	var columns = UdmRaicesColumns;
 	}
 
 	var url = "report/udm/" + cycle + ".json?a=0&b=10&mode=" + deposit;
@@ -200,6 +212,13 @@ $(document).ready(function() {
 	$('#UdmAV').click(function() {
 		console.log("UdmAV choosen... ")
 		setUdmReport("vivos");
+
+		return false;
+	});
+	
+	$('#UdmSAV').click(function() {
+		console.log("UdmSAV choosen... ")
+		setUdmReport("raices");
 
 		return false;
 	});
@@ -259,4 +278,25 @@ $(document).ready(function() {
 
 		return false;
 	});
+	
+	// definition of external documents (protocols, description)
+	$('#antecedentesModal').each(function() {
+		$('#antecedentesModal').load("../static/docs/reporte_observacion_vivos.html");
+ 
+		return false;
+
+		});
+	$('#observacionModal').each(function() {
+		$('#observacionModal').load("../static/docs/reporte_observacion_vivos.html");
+ 
+		return false;
+
+		});
+	
+	$('#udmModal').each(function() {
+		$('#udmModal').load("../static/docs/reporte_udm_vivos.html");
+ 
+		return false;
+
+		});
 });

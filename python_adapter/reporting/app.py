@@ -11,7 +11,7 @@ import datetime
 import os, json
 from collections import OrderedDict
 
-from flask import Flask, abort, url_for, request
+from flask import Flask, abort, url_for, request, Response, send_from_directory, stream_with_context
 
 
 from flask_sqlalchemy import SQLAlchemy
@@ -19,7 +19,7 @@ from html import HTML
 from flask.ext.script import Manager
 from flask.ext.log import Logging
 
-from tables.models import  get_metadata_single_table, get_all_udm_count,\
+from tables.models import  get_metadata_single_table, get_all_udm_count, \
     get_all_observation_count
     
 from tables.views import view_observations, view_single_observations, view_single_udm, \
@@ -38,7 +38,6 @@ from tools.converter import url2Dict
 from tools.r_calculation import code, BASE, CARBONO5, DCARBONO, BIOMASA, \
     RECUPERATION, FEFA
 from flask.templating import render_template
-from flask.helpers import send_from_directory
 from flask.ext.compress import Compress
 
 
@@ -272,7 +271,7 @@ def get_metadata_table_report(tablename):
 
 def get_siteEndpoints():
     output = []
-    variables_examples =  getConfig()["BASE"]["EXAMPLE_URLS"]
+    variables_examples = getConfig()["BASE"]["EXAMPLE_URLS"]
     variables_documentation = getConfig()["BASE"]["DOCUMENTATION_URLS"]
         
     for rule in app.url_map.iter_rules():
@@ -303,38 +302,39 @@ def site_map():
 @app.route('/report/calculate')
 @crossdomain(origin='*')
 def calculate_reports():
-    REPORT_DEBUG = request.args.get('debug', "true").upper()
-    processing_time = OrderedDict()
-    
-    
-    h = HTML()
-    h.title = "Report generation [%s] " % str(datetime.datetime.now())
-    start = time.time()
-    old_time = time.time()
-    
-    import rpy2.robjects as robjects
-    base = config["BASE"]["R_BASE"]
-    for component in [CARBONO5, DCARBONO, BIOMASA, RECUPERATION, FEFA]:
-        r_code = code[BASE] % (base, REPORT_DEBUG) + code[component]
-        try:
-            r = robjects.r(r_code)
-        except ValueError, error:
-            return str(error)
+    def generate():
+        REPORT_DEBUG = request.args.get('debug', "true").upper()
+        processing_time = OrderedDict()
         
-        processing_time[component] = str(time.time() - old_time)
+        yield str("Report generation [%s] " % str(datetime.datetime.now()))
+        start = time.time()
         old_time = time.time()
-      
-    h.h2("Processing time:")
-    with h.ul as l:
-        for key, value  in processing_time.iteritems():
-            l.li("%s: %s sec" % (key, value))
+        
+        import rpy2.robjects as robjects
+        base = config["BASE"]["R_BASE"]
+        for component in [CARBONO5, DCARBONO, BIOMASA, RECUPERATION, FEFA]:
+            r_code = code[BASE] % (base, REPORT_DEBUG) + code[component]
+            try:
+                r = robjects.r(r_code)
+            except ValueError, error:
+                app.logger.error(error)
+                yield str(error)
+            
+            old_time = time.time()
+            yield "Processing time..."
+            yield "%s: %s sec." % (str(r), str(time.time() - old_time))
+          
 
-    h.br
-    h.p("Total processing time: %s sec." % str(time.time() - start))
-    h.br
-    print "Processing time: %s" % str(time.time() - start)
+        yield "Total processing time: %s sec." % str(time.time() - start)
+        print "Processing time: %s" % str(time.time() - start)  
+        yield "Processing time: %s" % str(time.time() - start)
+        
     
-    return str(h)
+
+    response = Response(stream_with_context(generate()), content_type='text/html')
+    response.status_code = 200
+
+    return response
 
 @app.route('/favicon.ico')
 @app.route('/robots.txt')
@@ -345,17 +345,20 @@ def static_from_root():
 @app.route('/SINAMEF/')
 def webui(name=None):
     table_structure = dict()
-    for modules in [k for k in config["EXCEL_FORMAT"].keys() if k not in ["stocks"]]:
+    available_modules = [k for k in config["EXCEL_FORMAT"].keys() if k not in ["stocks"]]
+    app.logger.info("Available module formats: %s" % str(available_modules))
+    for modules in available_modules:
         table_structure[modules] = dict()
-        table_structure[modules]["title"]=config["EXCEL_FORMAT"]["carbono5"]["title"] 
+        table_structure[modules]["title"] = config["EXCEL_FORMAT"]["carbono5"]["title"] 
         table_structure[modules]["columns"] = list()
         for item in config["EXCEL_FORMAT"][modules]["columns"]:
-            k,v = item.items()[0]
-            table_structure[modules]["columns"].append( {"data":k, "title":v})
-    print table_structure.keys()
-        
-    return render_template('sistema.html', name=name, 
-                           DEFAULT_OUTPUT_FORMAT=config["BASE"]["DEFAULT_OUTPUT_FORMAT"], 
+            k, v = item.items()[0]
+            table_structure[modules]["columns"].append({"data":k, "title":v})
+    
+    print table_structure
+    
+    return render_template('sistema.html', name=name,
+                           DEFAULT_OUTPUT_FORMAT=config["BASE"]["DEFAULT_OUTPUT_FORMAT"],
                            table_structure=json.dumps(table_structure))
 
 
@@ -365,25 +368,25 @@ def dataTableInterface(name=None):
  
     draw_counter = int(float(request_data[u"draw"][0]))
     source = request_data[u"sourceResource"][0]
-    app.logger.info("Table source: %s"%source)
+    app.logger.info("Table source: %s" % source)
     if "report/udm/T" in source:
-        cycle =request_data[u"cycle"][0]
-        view_mode=url2Dict(source)[u"mode"]
-        a=int(float(request_data[u"start"][0]))
-        b=int(float(request_data[u"length"][0]))
+        cycle = request_data[u"cycle"][0]
+        view_mode = url2Dict(source)[u"mode"]
+        a = int(float(request_data[u"start"][0]))
+        b = int(float(request_data[u"length"][0]))
      
         engine = db.get_engine(app)
         row_counter = get_all_udm_count(engine, cycle)
-        obs = obs = view_all_udm(engine, (a,b),cycle, mode=view_mode)
+        obs = obs = view_all_udm(engine, (a, b), cycle, mode=view_mode)
         print obs
         
         return makeJsonResponse(obs, totalRecords=row_counter, draw=draw_counter)
     
     elif "report/observation/T" in source:
-        cycle =request_data[u"cycle"][0]
-        view_mode=url2Dict(source)[u"mode"]
-        a=int(float(request_data[u"start"][0]))
-        b=int(float(request_data[u"length"][0]))
+        cycle = request_data[u"cycle"][0]
+        view_mode = url2Dict(source)[u"mode"]
+        a = int(float(request_data[u"start"][0]))
+        b = int(float(request_data[u"length"][0]))
                 
         engine = db.get_engine(app)
         row_counter = get_all_observation_count(engine, cycle)
@@ -392,8 +395,8 @@ def dataTableInterface(name=None):
         return makeJsonResponse(obs, totalRecords=row_counter, draw=draw_counter)
     
     elif "report/national/" in source:
-        cycle =request_data[u"cycle"][0]
-        strata_type=request_data[u"strata_type"][0]
+        cycle = request_data[u"cycle"][0]
+        strata_type = request_data[u"strata_type"][0]
 
         engine = db.get_engine(app)
         row_counter = get_all_observation_count(engine, cycle)

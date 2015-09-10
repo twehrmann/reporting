@@ -26,15 +26,25 @@
 		<section class="top-bar-section">
 			<ul class="right">
 				<li class="divider"></li>
-				<li><a href="#"><i class="fi-trees"></i> Antecedentes</a></li>
+				<li><a href="#" data-reveal-id="antecedentesModal"><i class="fi-trees"></i> Antecedentes</a>
+				<div id="antecedentesModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog"></div></li>
 				<li class="divider"></li>
 				<li class="has-dropdown"><a href="#"><i class="fi-database"></i> Metadatos</a>
 					<ul class="dropdown">
-						<li><a href="#">Dropdown Option</a></li>
-						<li><a href="#">Dropdown Option</a></li>
-						<li><a href="#">Dropdown Option</a></li>
+						<li><a href="#">nivel de OBSERVACIÓN</a></li>
+						
+						<li><a href="#" data-reveal-id="observacionModal">para VIVOS, MUERTOS EN PIE Y TOCONES</a>
+						<div id="observacionModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog"></div></li>
 						<li class="divider"></li>
-						<li><a href="#">See all →</a></li>
+						<li><a href="#">nivel de UDM</a></li>
+						<li><a href="#" data-reveal-id="udmModal">para VIVOS, MUERTOS EN PIE Y TOCONES</a>
+						<div id="udmModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog"></div></li>
+						
+						<li class="divider"></li>
+						<li><a href="#">nivel de ESTRATO</a></li>
+						<li class="divider"></li>
+						<li><a href="#">nivel NACIONAL</a></li>
+						
 					</ul></li>
 			</ul>
 		</section>
@@ -42,8 +52,7 @@
 	<div class="row">
 		<div class="large-4 columns">
 			<h1>
-				<i class="fi-wrench"></i> SINAMEF
-			</h1>
+				<i class="fi-wrench"></i> SINAMEF</h1>
 
 		</div>
 		<div class="large-8 columns">
@@ -63,64 +72,84 @@
 			</ul>
 		</div>
 		<div class="large-4 pull-8 columns">
-
 			<ul class="accordion" data-accordion role="tablist">
-				<li class="accordion-navigation"><a href="#panel1d" role="tab" id="panel1d-heading" aria-controls="panel1d">Observación</a>
+				<li class="accordion-navigation"><a href="#panel1d" role="tab" id="panel1d-heading" aria-controls="panel1d" 
+				data-tooltip aria-haspopup="true" title="Nivel del reporte">Observación</a>
 					<div id="panel1d" class="content active" role="tabpanel" aria-labelledby="panel1d-heading">
 						<ul class="stack button-group" id="observationGroup">
-							<label id="observationPeriod">Período <select>
-									<option value="T1">2004-2007 (T1)</option>
-									<option value="T2">2009-2014 (T2)</option>
+							<label id="observationPeriod"><span data-tooltip class="has-tip" title="Ciclo del INFyS">Período</span> <select>
+									<option value="T1">2004-2007 (ciclo 1)</option>
+									<option value="T2">2009-2013 (ciclo 2)</option>
 							</select>
 							</label>
-							<li><a id="ObservationAV" href="#" class="button"><i class="fi-trees"></i>Arbolado vivo</a></li>
-							<li><a id="ObservationMEP" href="#" class="button"><i class="fi-trees"></i>Arboles muertos en pie</a></li>
-							<li><a id="ObservationT"  href="#" class="button"><i class="fi-trees"></i>Tocones</a></li>
+							<li><a id="ObservationAV" href="#" class="button"><i class="fi-trees"></i>
+							<span data-tooltip aria-haspopup="true" title="Biomasa arbolada">Biomasa aérea</span></a></li>
+							<li><a id="ObservationSAV" href="#" class="button disabled"><i class="fi-trees"></i>Biomasa subterránea</a></li>
+							<li><a aria-controls="ObservacionAlmacen" aria-expanded="false" data-dropdown="ObservacionAlmacen" href="#" class="button dropdown">
+							<i class="fi-dropdown"></i>Madera muerta</a>
+							
+							<ul id="ObservacionAlmacen" data-dropdown-content class="f-dropdown" aria-hidden="true">
+	 							<li><a id="ObservationMEP" href="#" class="button disabled"><i class="fi-trees"></i>Arboles muertos en pie</a></li>
+								<li><a id="ObservationT" href="#" class="button disabled"><i class="fi-trees"></i>Tocones</a></li>
+								<li><a href="#" class="button disabled"><i class="fi-trees"></i>Mat. Leñoso Caído</a></li>
+							</ul>
+							</li>
+							
 							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Hojarasca</a></li>
 							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Suelos</a></li>
 						</ul>
 					</div></li>
 
-				<li class="accordion-navigation"><a href="#panel2d" role="tab" id="panel2d-heading" aria-controls="panel2d">Unidad de
+				<li class="accordion-navigation"><a href="#panel2d" role="tab" id="panel2d-heading" aria-controls="panel2d" 
+				data-tooltip aria-haspopup="true" title="Nivel del reporte">Unidad de
 						Muestreo</a>
 					<div id="panel2d" class="content" role="tabpanel" aria-labelledby="panel2d-heading">
 						<ul class="stack button-group">
 							<label id="udmPeriod">Período <select>
-									<option value="T1">2004-2007 (T1)</option>
-									<option value="T2">2009-2014 (T2)</option>
+									<option value="T1">2004-2007 (ciclo 1)</option>
+									<option value="T2">2009-2013 (ciclo 2)</option>
 							</select>
 							</label>
-							<li><a id="UdmAV" href="#" class="button"><i class="fi-trees"></i>Arbolado vivo</a></li>
-							<li><a id="UdmM" href="#" class="button"><i class="fi-trees"></i>Arboles muertos en pie</a></li>
-							<li><a id="UdmT" href="#" class="button"><i class="fi-trees"></i>Tocones</a></li>
-							<li><a href="#" class="button disabled"><i class="fi-trees"></i>MLC</a></li>
+							<li><a id="UdmAV" href="#" class="button"><i class="fi-trees"></i>Biomasa aérea</a></li>
+							<li><a id="UdmSAV" href="#" class="button"><i class="fi-trees"></i>Biomasa subterránea</a></li>
+							<li><a aria-controls="UdmAlmacen" aria-expanded="false" data-dropdown="UdmAlmacen" href="#" class="button dropdown">
+							<i class="fi-dropdown"></i>Madera muerta</a>
+							
+							<ul id="UdmAlmacen" data-dropdown-content class="f-dropdown" aria-hidden="true">
+	 							<li><a id="UdmM" href="#" class="button"><i class="fi-trees"></i>Arboles muertos en pie</a></li>
+								<li><a id="UdmT" href="#" class="button"><i class="fi-trees"></i>Tocones</a></li>
+								<li><a href="#" class="button disabled"><i class="fi-trees"></i>Mat. Leñoso Caído</a></li>
+							</ul>
+							</li>
+							
 							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Hojarasca</a></li>
 							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Suelos</a></li>
 						</ul>
 					</div></li>
 
-				<li class="accordion-navigation"><a href="#panel3d" role="tab" id="panel3d-heading" aria-controls="panel3d">Estrato</a>
+				<li class="accordion-navigation"><a href="#panel3d" role="tab" id="panel3d-heading" aria-controls="panel3d"
+				data-tooltip aria-haspopup="true" title="Nivel del reporte">Estrato</a>
 					<div id="panel3d" class="content" role="tabpanel" aria-labelledby="panel3d-heading">
 						<label>Subcategoría <select id="strataSubcategory">
-								<option value="tf-tf">TF:TF Tierras Forestales convertidas en Tierras Forestales</option>
-								<option value="tfd-tf">TFd:TF Tierras Forestales degradadas convertidas en Tierras Forestales</option>
-								<option value="tf-tfd">TF:TFd Tierras Forestales convertidas en Tierras Forestales degradadas</option>
-								<option value="tf-ot">TF:OT Tierras Forestales convertidas en Otras Tierras</option>
-								<option value="ot-tf">OT:TF Otras Tierras convertidas en Tierras Forestales</option>
+								<option value="tf-tf">TF-TF (Tierras Forestales convertidas en Tierras Forestales)</option>
+								<option value="tfd-tf">TFd-TF (Tierras Forestales degradadas convertidas en Tierras Forestales)</option>
+								<option value="tf-tfd">TF-TFd (Tierras Forestales convertidas en Tierras Forestales degradadas)</option>
+								<option value="tf-ot">OT-TF (Otras Tierras convertidas en Tierras Forestales)</option>
+								<option value="ot-tf">OT-TF (Otras Tierras convertidas en Tierras Forestales)</option>
 						</select>
 						</label> <label>Estratificación <select id="strataStratification">
-								<option value="madmex">MAD MEX (32 Clases)</option>
-								<option value="bur">INEGI (Agrupado en las clases del BUR)</option>
-								<option value="inegi">INEGI (agrupado en las clases de MADMEX)</option>
+								<option value="madmex">MADMex (32 Clases)</option>
+								<option value="bur">INEGI (Clases BUR)</option>
+								<option value="inegi">INEGI (Clases MADMex)</option>
 						</select>
 						</label> <label>Período <select id="strataPeriod">
-								<option value="T1">2004-2007 (T1)</option>
-								<option value="T2">2009-2014 (T2)</option>
+								<option value="T1">2004-2007 (ciclo 1)</option>
+								<option value="T2">2009-2013 (ciclo 2)</option>
 						</select>
 						</label> <label>Depósito<select id="strataDeposit">
 								<option value="carbono_arboles">Biomasa Aérea</option>
 								<option value="carbono_subterranea" disabled>Biomasa Subterránea</option>
-								<option value="carbono_tocones">Madera Muerta (árboles muertos en pie, tocones y Material Leñoso Caído)</option>
+								<option value="carbono_tocones">Madera Muerta</option>
 								<option value="carbono_hojarasca" disabled>Hojarasca</option>
 								<option value="carbono_organica_suelo" disabled>Materia Orgánica del Suelos</option>
 
@@ -128,18 +157,19 @@
 						</label>
 					</div></li>
 
-				<li class="accordion-navigation"><a href="#panel4d" role="tab" id="panel4d-heading" aria-controls="panel4d">Nacional</a>
+				<li class="accordion-navigation"><a href="#panel4d" role="tab" id="panel4d-heading" aria-controls="panel4d"
+				data-tooltip aria-haspopup="true" title="Nivel del reporte">Nacional</a>
 					<div id="panel4d" class="content" role="tabpanel" aria-labelledby="panel4d-heading">
 						<ul class="stack button-group" id="observationGroup">
 							<label id="nationalPeriod">Período <select>
-									<option value="T1">2004-2007 (T1)</option>
-									<option value="T2">2009-2014 (T2)</option>
+									<option value="T1">2004-2007 (ciclo 1)</option>
+									<option value="T2">2009-2013 (ciclo 2)</option>
 							</select>
 							</label>
-							<li><a id="nationalBUR" href="#" class="button"><i class="fi-trees"></i>Reporte BUR</a></li>
-							<li><a id="nationalREDD+" href="#" class="button"><i class="fi-trees"></i>Report REDD+</a></li>
-							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Reporte Anual Forestal (FRA)</a></li>
-							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Niveles de Referencia de Emisiones (NRE)</a></li>
+							<li><a id="nationalBUR" href="#" class="button"><i class="fi-trees"></i>INEGEI-BUR (USCUSS)</a></li>
+							<li><a id="nationalREDD+" href="#" class="button disabled"><i class="fi-trees"></i>Reporte REDD+</a></li>
+							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Reporte REDD+</a></li>
+							<li><a href="#" class="button disabled"><i class="fi-trees"></i>Reporte NREF</a></li>
 						</ul></li>
 			</ul>
 			<p>
@@ -159,8 +189,22 @@
 				</div>
 				<div class="large-6 columns">
 					<ul class="inline-list right">
-						<li><a href="#">Soporte</a></li>
-						<li><a href="#">Documentación</a></li>
+						<li><a href="#" data-reveal-id="supportModal">Soporte</a>
+						<div id="supportModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+						  <h2 id="modalTitle">Soporte del sistema</h2>
+						  <p class="lead">Descripcion</p>
+						  <p>Informaciones...</p>
+						  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+						</div>
+						</li>
+						<li><a href="#" data-reveal-id="documentationModal">Documentación</a>
+						<div id="documentationModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+						  <h2 id="modalTitle">Documentacion del sistema</h2>
+						  <p class="lead">Descripcion</p>
+						  <p>Informaciones...</p>
+						  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+						</div>
+						</li>
 
 					</ul>
 				</div>
@@ -182,6 +226,7 @@
 	var FEcolumnsDegrad = [];
 	var ObservationCarbonoAereoColumns = [];
 	var UdmVivoColumns = [];
+	var UdmRaicesColumns = [];
 	var UdmMuertosColumns = [];
 	var UdmToconesColumns = [];
 	var NationalReportColumns = [];
@@ -203,6 +248,11 @@
 		UdmVivoColumns.push({"data":struct["base_udm_vivo"]["columns"][col].data, "title":struct["base_udm_vivo"]["columns"][col].title});
 	}
 	
+	for (var col in struct["base_udm_raices"]["columns"])
+	{
+		UdmRaicesColumns.push({"data":struct["base_udm_raices"]["columns"][col].data, "title":struct["base_udm_raices"]["columns"][col].title});
+	}
+	
 	for (var col in struct["base_udm_muertos"]["columns"])
 	{
 		UdmMuertosColumns.push({"data":struct["base_udm_muertos"]["columns"][col].data, "title":struct["base_udm_muertos"]["columns"][col].title});
@@ -219,17 +269,30 @@
 	
 
 	var NationalReportColumns = [{
-		"data" : "Dinamica", "title":"Dinamica"}, {
-		"data" : "Area", "title":"Area"}, {
-		"data" : "EmisionesAbsorciones", "title":"Emisiones/Absorciones"}, {
-		"data" : "U", "title":"U (%)"
+		"data" : "Dinamica", "title":"Cambio de Uso de Suelo"}, {
+		"data" : "Area", "title":"Superficie (ha)"}, {
+		"data" : "EmisionesAbsorciones", "title":"Emisiones de C (tonC)"}, {
+		"data" : "U", "title":"Incertidumbre (%)"
 	}]
 	</script>
 
 	<script src="{{ url_for('static', filename='js/sinamef.js') }}"></script>
 
 	<script>
-		$(document).foundation();
+		$(document).foundation({
+			  tooltip: {
+				    selector : '.has-tip',
+				    additional_inheritable_classes : [],
+				    tooltip_class : '.tooltip',
+				    touch_close_text: 'tap to close',
+				    disable_for_touch: false,
+				    tip_template : function (selector, content) {
+				      return '<span data-selector="' + selector + '" class="'
+				        + Foundation.libs.tooltip.settings.tooltip_class.substring(1)
+				        + '">' + content + '<span class="nub"></span></span>';
+				    }
+				  }
+				});
 	</script>
 </body>
 </html>

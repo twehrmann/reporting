@@ -42,6 +42,8 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = 'm*\xc8Mw\xaa\x91\xd9o\xa0\xf5\xd0\x03!\xbc\xe9\xa9\x0f\x10\x94\xac,\x8e\xd8'
     SQLALCHEMY_DATABASE_URI = getConfig()["BASE"]["DB_STRING"]
+    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_POOL_SIZE = 10
 
 
 class ProductionConfig(Config):

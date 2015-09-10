@@ -19,7 +19,7 @@ BASE:
     DOCUMENTATION_URLS:
         filename: Static files like metadata catalogues
         tablename: Table name for its metadata access
-        cycle: INFyS cycle, in 2015 it is 1 (2004-2007) y 2 (2009-1013)
+        cycle: INFyS ciclo, en 2015 it is 1 (2004-2007) y 2 (2009-1013)
         id: id_unidad_muestreo
         udm_id: id_unidad_muestreo
         stock: type of carbon stock, e.g. carbono_arboles, carbono_tocones, carbono_raices_por_sitio y carbono_muertospie are calculated/possible
@@ -69,44 +69,44 @@ OBS_COLUMN_MAPPER:
         - numero_conglomerado
         - seccion_infys
         - numero_arbol
+        - numero_sitio
         - carbono_aereo_estimado
 
 UDM_COLUMN_MAPPER:
     carbono:
-        - id_unidad_muestreo
+        - numero_conglomerado
+        - numero_sitio        
         - numero_especies_existentes
+        - biomasa_vivos
         - carbono_vivos
-        - carbono_raices
-        - carbono_muertos_pie
-        - carbono_tocones
+        - individuos_vivos
         - tallos_totales
     vivos:
-        - id_unidad_muestreo
-        - numero_conglomerado        
+        - numero_conglomerado
+        - numero_sitio        
         - numero_especies_existentes
         - biomasa_vivos
         - carbono_vivos
         - individuos_vivos
         - tallos_totales
     tocones:
-        - id_unidad_muestreo
-        - numero_conglomerado   
+        - numero_conglomerado
+        - numero_sitio        
         - numero_especies_existentes
         - biomasa_tocones
         - carbono_tocones
         - individuos_tocones
         - tallos_totales
     raices:
-        - id_unidad_muestreo
-        - numero_conglomerado   
+        - numero_conglomerado
+        - numero_sitio        
         - numero_especies_existentes
         - biomasa_raices
         - carbono_raices
-        - carbono_raices
         - tallos_totales
     muertos_pie:
-        - id_unidad_muestreo
-        - numero_conglomerado   
+        - numero_conglomerado
+        - numero_sitio        
         - numero_especies_existentes
         - biomasa_muertos_pie
         - carbono_muertos_pie
@@ -197,35 +197,44 @@ EXCEL_FORMAT:
         title: Calculo de modelo
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
-            - id_unidad_muestreo: id muestreo
-            - numero_conglomerado: "# cong"
-            - numero_especies_existentes: "# especies"
-            - biomasa_vivos: biomasa
-            - carbono_vivos: carbono (t/ha)
-            - tallos_totales: tallos
+            - numero_conglomerado: ID Conglomerado
+            - numero_sitio: ID Sitio
+            - numero_especies_existentes: Num. Especies
+            - biomasa_vivos: Densidad de Biomasa (ton/ha)
+            - carbono_vivos: Densidad de Carbono (tonC/ha) 
+            - tallos_totales: Tallos Total
     base_udm_muertos:
         title: Calculo de modelo
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
-            - id_unidad_muestreo: id muestreo
-            - numero_conglomerado: "# cong"
-            - numero_especies_existentes: "# especies"
-            - biomasa_muertos_pie: biomasa
-            - carbono_muertos_pie: carbono
-            - individuos_muertos_pie: "# muertos pie"
-            - tallos_totales: tallos
+            - numero_conglomerado: ID Conglomerado
+            - numero_sitio: ID Sitio
+            - numero_especies_existentes: Num. Especies
+            - biomasa_muertos_pie: Densidad de Biomasa (ton/ha)
+            - carbono_muertos_pie: Densidad de Carbono (tonC/ha) 
+            - individuos_muertos_pie: Muertos pie Total
+            - tallos_totales: Tallos Total
     base_udm_tocones:
         title: Calculo de modelo
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
-            - id_unidad_muestreo: id muestreo
-            - numero_conglomerado: "# cong"
-            - numero_especies_existentes: "# especies"
-            - biomasa_tocones: biomasa
-            - carbono_tocones: carbono
-            - individuos_tocones: "# tocones pie"
-            - tallos_totales: tallos
-
+            - numero_conglomerado: ID Conglomerado
+            - numero_sitio: ID Sitio
+            - numero_especies_existentes: Num. Especies
+            - biomasa_tocones: Densidad de Biomasa (ton/ha)
+            - carbono_tocones: Densidad de Carbono (tonC/ha) 
+            - individuos_tocones: Tocones Total
+            - tallos_totales: Tallos Total
+    base_udm_raices:
+        title: Calculo de modelo
+        source: "Fuente de Datos: Ciclo %s del INFyS"
+        columns:
+            - numero_conglomerado: ID Conglomerado
+            - numero_sitio: ID Sitio
+            - numero_especies_existentes: Num. Especies
+            - biomasa_raices: Densidad de Biomasa (ton/ha)
+            - carbono_raices: Densidad de Carbono (tonC/ha) 
+            - tallos_totales: Tallos Total
     base_observation:
         title: Calculo de modelo
         source: "Fuente de Datos: Ciclo %s del INFyS"
@@ -233,11 +242,11 @@ EXCEL_FORMAT:
             - desposito_ipcc_1: Desposito en nivel IPCC 1
             - desposito_ipcc_2: Desposito en nivel IPCC 2
             - desposito_ipcc_3: Desposito en nivel IPCC 3
-            - numero_conglomerado: NumCong
-            - seccion_infys: seccion de INFyS
+            - numero_conglomerado: ID Conglomerado
+            - seccion_infys: Secc. INFyS
             - numero_sitio: NumSit
             - numero_registro: NumReg
-            - numero_arbol: numero de arboles
+            - numero_arbol: Num. Arboles
             - familia: familia
             - nombre_cientifico: nombre_cientifico
             - condicion: condicion
@@ -257,7 +266,7 @@ EXCEL_FORMAT:
             - biomasa_area_estimada: biomasa_area_estimada
             - fraccion_carbono: fraccion_carbono
             - tipo_fraccion_carbono: tipo_fraccion_carbono
-            - carbono_aereo_estimado: carbono_aereo_estimado
+            - carbono_aereo_estimado: Contenido de Carbono (tonC) 
             - id_levantamiento: id_levantamiento
             - id_calculo_modelo_arbolado: id_calculo_modelo_arbolado
             - id_unidad_muestreo: id_unidad_muestreo
@@ -269,51 +278,52 @@ EXCEL_FORMAT:
         title: Calculo de modelo
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
-            - numero_conglomerado: NumCong
-            - numero_arbol: numero de arboles
-            - seccion_infys: seccion de INFyS
-            - carbono_aereo_estimado: Carbono estimado
+            - numero_conglomerado: ID Conglomerado
+            - numero_sitio: ID Sitio
+            - numero_arbol: Num. Arboles
+            - seccion_infys: Secc. INFyS
+            - carbono_aereo_estimado: Contenido de Carbono (tonC) 
     carbono5:
         title: Densidades de carbono
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
             - Estrato: Estrato
-            - NumSitios: NumSitios
-            - NumCong: NumCong
-            - AreaHa: Area (ha)
-            - ER: ER (tonC/ha)
-            - U: U (%)
+            - NumCong: Num. Conglomerados
+            - NumSitios: Num. Sitios    
+            - AreaHa: Superficie (ha)
+            - ER: Densidad de Carbono (tonC/ha) 
+            - U: Incertidumbre (%)
     dcarbono:
         title: Cambios en las densidades de carbono
         source: "Fuente de Datos: Ciclo 1 y 2 del INFyS"
         columns:
             - Estrato: Estrato
-            - NumSitios: NumSitios
-            - NumCong: NumCong
-            - AreaHa: Area (ha)
-            - ER: ER (tonC/ha)
-            - U: U (%)
+            - NumCong: Num. Conglomerados
+            - NumSitios: Num. Sitios    
+            - AreaHa: Superficie (ha)
+            - ER: Densidad de Carbono (tonC/ha) 
+            - U: Incertidumbre (%)
     refoRecu:
         title: Tasas de recuperación / reforestación
         source: "Fuente de Datos: Ciclo 1 y 2 del INFyS"
         columns:
            - Estrato: Estrato
-           - parametro: TonC/ha/año
-           - Ulwr: Ulwr (%)
-           - Uupr: Uupr (%)
+           - parametro: Densidad de Carbono (tonC/ha) 
+           - Ulwr: Alta incertidumbre (%)
+           - Uupr: Baja incertidumbre (%)
     biomasa_viva:
         title: Suma de carbono por sitio
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
             - Estrato: Estrato
-            - TotUMPreal: Area total (ha)
-            - EstRasonHa: ER (tonC/ha)
+            - TotUMPreal: Superficie (ha)
+            - EstRasonHa: Densidad de Carbono (tonC/ha) 
             - U: U (%)
     'factores de emision con error propagacion':
         title: Factores de emision y absorbcion con error propagacion
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
-            - Dinamica: Dinamica
-            - Area: Area
-            - EmisionesAbsorciones: E/A
-            - U: U
+            - Dinamica: Cambio de Uso de Suelo
+            - Area: Superficie (ha)
+            - EmisionesAbsorciones: Emisiones de C (tonC)
+            - U: Incertidumbre (%)

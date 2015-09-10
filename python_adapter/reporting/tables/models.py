@@ -77,7 +77,7 @@ def get_all_observations(engine, cycle, limit_a=0, limit_b=100):
 
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
-        return mapping.slice(limit_a, limit_a+limit_b).all()
+        return mapping.order_by(mapping.numero_conglomerado, mapping.numero_sitio).slice(limit_a, limit_a+limit_b).all()
     else:
         return list()
     
@@ -110,7 +110,7 @@ def get_all_udm(engine, (limit_a, limit_b), cycle):
     mapping = readTable(engine, schema_name, table_name)
 
     if mapping != None:
-        return mapping.slice(limit_a, limit_a+limit_b).all()
+        return mapping.order_by(mapping.numero_conglomerado, mapping.numero_sitio).slice(limit_a, limit_a+limit_b).all()
     else:
         return list()
     
