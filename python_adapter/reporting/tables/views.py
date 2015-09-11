@@ -31,7 +31,7 @@ def view_observations(engine, cycle, (a, b), mode=None):
     app.logger.info("OBSERVATION VIEW for %s between %s:%s [%s]" % (cycle, a, b, mode))
     if mode not in OBS_COLUMN_MAPPER.keys():
         mode = None
-    obs = get_all_observations(engine,cycle,  a, b)
+    obs = get_all_observations(engine,cycle,  a, b, mode)
     return transformStructure(obs, mode, OBS_COLUMN_MAPPER, shortenString=True)
    
 

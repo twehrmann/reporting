@@ -67,7 +67,22 @@ STRATA_DEFINITION:
 OBS_COLUMN_MAPPER:
     arbolado_vivo:
         - numero_conglomerado
-        - seccion_infys
+        - numero_registro
+        - nombre_cientifico
+        - numero_arbol
+        - numero_sitio
+        - carbono_aereo_estimado
+    tocones:
+        - numero_conglomerado
+        - numero_registro
+        - nombre_cientifico
+        - numero_arbol
+        - numero_sitio
+        - carbono_aereo_estimado
+    mlc:
+        - numero_conglomerado
+        - numero_registro
+        - nombre_cientifico
         - numero_arbol
         - numero_sitio
         - carbono_aereo_estimado
@@ -80,7 +95,7 @@ UDM_COLUMN_MAPPER:
         - biomasa_vivos
         - carbono_vivos
         - individuos_vivos
-        - tallos_totales
+        - individuos_vivos_estimacion
     vivos:
         - numero_conglomerado
         - numero_sitio        
@@ -88,7 +103,7 @@ UDM_COLUMN_MAPPER:
         - biomasa_vivos
         - carbono_vivos
         - individuos_vivos
-        - tallos_totales
+        - individuos_vivos_estimacion
     tocones:
         - numero_conglomerado
         - numero_sitio        
@@ -96,7 +111,7 @@ UDM_COLUMN_MAPPER:
         - biomasa_tocones
         - carbono_tocones
         - individuos_tocones
-        - tallos_totales
+        - individuos_tocones_estimacion
     raices:
         - numero_conglomerado
         - numero_sitio        
@@ -111,6 +126,7 @@ UDM_COLUMN_MAPPER:
         - biomasa_muertos_pie
         - carbono_muertos_pie
         - individuos_muertos_pie
+        - individuos_muertos_pie_estimacion
         - tallos_totales
 
         
@@ -197,44 +213,44 @@ EXCEL_FORMAT:
         title: Calculo de modelo
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
-            - numero_conglomerado: ID Conglomerado
+            - numero_conglomerado: ID Cong.
             - numero_sitio: ID Sitio
             - numero_especies_existentes: Num. Especies
             - biomasa_vivos: Densidad de Biomasa (ton/ha)
             - carbono_vivos: Densidad de Carbono (tonC/ha) 
-            - tallos_totales: Tallos Total
+            - individuos_vivos: Observa- ciones totales
+            - individuos_vivos_estimacion: Observacion- es para estimación
     base_udm_muertos:
         title: Calculo de modelo
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
-            - numero_conglomerado: ID Conglomerado
+            - numero_conglomerado: ID Cong.
             - numero_sitio: ID Sitio
             - numero_especies_existentes: Num. Especies
             - biomasa_muertos_pie: Densidad de Biomasa (ton/ha)
             - carbono_muertos_pie: Densidad de Carbono (tonC/ha) 
-            - individuos_muertos_pie: Muertos pie Total
-            - tallos_totales: Tallos Total
+            - individuos_muertos_pie: Observa- ciones totales
+            - individuos_muertos_pie_estimacion: Observacion- es para estimación
     base_udm_tocones:
         title: Calculo de modelo
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
-            - numero_conglomerado: ID Conglomerado
+            - numero_conglomerado: ID Cong.
             - numero_sitio: ID Sitio
             - numero_especies_existentes: Num. Especies
             - biomasa_tocones: Densidad de Biomasa (ton/ha)
             - carbono_tocones: Densidad de Carbono (tonC/ha) 
-            - individuos_tocones: Tocones Total
-            - tallos_totales: Tallos Total
+            - individuos_tocones: Observa- ciones totales
+            - individuos_tocones_estimacion: Observacion- es para estimación
     base_udm_raices:
         title: Calculo de modelo
         source: "Fuente de Datos: Ciclo %s del INFyS"
         columns:
-            - numero_conglomerado: ID Conglomerado
+            - numero_conglomerado: ID Cong.
             - numero_sitio: ID Sitio
             - numero_especies_existentes: Num. Especies
             - biomasa_raices: Densidad de Biomasa (ton/ha)
             - carbono_raices: Densidad de Carbono (tonC/ha) 
-            - tallos_totales: Tallos Total
     base_observation:
         title: Calculo de modelo
         source: "Fuente de Datos: Ciclo %s del INFyS"
@@ -280,8 +296,9 @@ EXCEL_FORMAT:
         columns:
             - numero_conglomerado: ID Conglomerado
             - numero_sitio: ID Sitio
+            - numero_registro: Num. de registro/tallo
             - numero_arbol: Num. Arboles
-            - seccion_infys: Secc. INFyS
+            - nombre_cientifico: Nombre cientifico
             - carbono_aereo_estimado: Contenido de Carbono (tonC) 
     carbono5:
         title: Densidades de carbono

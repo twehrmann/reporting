@@ -50,10 +50,9 @@ def sqlAlchemy2Dict(obj, shortenString=False):
 
         return structure
     
-def transformStructure(obs, mode, translation, shortenString=False):
-    print "MODE:",mode
-    
+def transformStructure(obs, mode, translation, shortenString=False):    
     structure = list()
+    
     if len(obs) > 0:
         if mode != None:
             if mode in translation.keys():

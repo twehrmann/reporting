@@ -53,6 +53,8 @@ function InitTable(tableId, columns, serverSide) {
 			"filter" : false,
 			"scrollY" : "650px",
 			"scrollCollapse" : true,
+			"aLengthMenu": [[100, 500, 1000, 5000], [100, 500, 1000, 5000]],
+			"iDisplayLength": 100,
 			"pagingType" : "simple",
 			"ajax" : {
 				"url" : "datatable",
@@ -195,16 +197,16 @@ $(document).ready(function() {
 		return false;
 	});
 
-	$('#ObservationMEP').click(function() {
+	$('#ObservationMLC').click(function() {
 		console.log("ObservationMEP choosen... ")
-		setObservationReport("arbolado_vivo");
+		setObservationReport("mlc");
 
 		return false;
 	});
 
 	$('#ObservationT').click(function() {
 		console.log("Observation tocones choosen... ")
-		setObservationReport("arbolado_vivo");
+		setObservationReport("tocones");
 
 		return false;
 	});

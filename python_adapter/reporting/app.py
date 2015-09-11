@@ -354,9 +354,7 @@ def webui(name=None):
         for item in config["EXCEL_FORMAT"][modules]["columns"]:
             k, v = item.items()[0]
             table_structure[modules]["columns"].append({"data":k, "title":v})
-    
-    print table_structure
-    
+        
     return render_template('sistema.html', name=name,
                            DEFAULT_OUTPUT_FORMAT=config["BASE"]["DEFAULT_OUTPUT_FORMAT"],
                            table_structure=json.dumps(table_structure))
@@ -385,11 +383,12 @@ def dataTableInterface(name=None):
     elif "report/observation/T" in source:
         cycle = request_data[u"cycle"][0]
         view_mode = url2Dict(source)[u"mode"]
+
         a = int(float(request_data[u"start"][0]))
         b = int(float(request_data[u"length"][0]))
                 
         engine = db.get_engine(app)
-        row_counter = get_all_observation_count(engine, cycle)
+        row_counter = get_all_observation_count(engine, cycle, mode=view_mode)
         obs = view_observations(engine, cycle, (a, b), mode=view_mode)
         
         return makeJsonResponse(obs, totalRecords=row_counter, draw=draw_counter)

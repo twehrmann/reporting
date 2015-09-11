@@ -72,22 +72,43 @@ def readTable(engine, scheme, table, prim_key=False):
         print err
         return None
 
-def get_all_observations(engine, cycle, limit_a=0, limit_b=100):
+def get_all_observations(engine, cycle, limit_a=0, limit_b=100, mode=None):
     schema_name, table_name = getObservationTable(cycle)
 
     mapping = readTable(engine, schema_name, table_name)
     if mapping != None:
-        return mapping.order_by(mapping.numero_conglomerado, mapping.numero_sitio).slice(limit_a, limit_a+limit_b).all()
+        if mode == "arbolado_vivo":
+            resultset = mapping.filter(mapping.desposito_ipcc_1=="Biomasa Viva").filter(mapping.condicion=="VIVO").order_by(mapping.numero_conglomerado, mapping.numero_sitio, mapping.numero_registro).slice(limit_a, limit_a+limit_b).all()
+        elif mode == "mlc":
+            resultset = mapping.filter(mapping.desposito_ipcc_1=="Materia Organica Muerta").filter(mapping.condicion=="TOCON").order_by(mapping.numero_conglomerado, mapping.numero_sitio, mapping.numero_registro).slice(limit_a, limit_a+limit_b).all()
+        elif mode == "tocones":
+            resultset = mapping.filter(mapping.desposito_ipcc_1=="Materia Organica Muerta").filter(mapping.condicion=="MUERTO PIE").order_by(mapping.numero_conglomerado, mapping.numero_sitio, mapping.numero_registro).slice(limit_a, limit_a+limit_b).all()
     else:
-        return list()
+        app.logger.error("No DB mapping to table.")
+        resultset = list()
+        
+    return resultset
     
-def get_all_observation_count(engine, cycle):
+def get_all_observation_count(engine, cycle, mode):
     schema_name, table_name = getObservationTable(cycle)
     mapping = readTable(engine, schema_name, table_name)
+
     if mapping != None:
-        return mapping.count()
+        if mode == "arbolado_vivo":
+            ds_count = mapping.filter(mapping.desposito_ipcc_1=="Biomasa Viva").filter(mapping.condicion=="VIVO").count() 
+        elif mode == "mlc":
+            ds_count = mapping.filter(mapping.desposito_ipcc_1=="Materia Organica Muerta").filter(mapping.condicion=="TOCON").count()
+        elif mode == "tocones":
+            ds_count = mapping.filter(mapping.desposito_ipcc_1=="Materia Organica Muerta").filter(mapping.condicion=="MUERTO PIE").count() 
+        else:
+            app.logger.error("No filter applied for dataset count.")
+            ds_count = 0
     else:
-        return 0
+        app.logger.error("No DB mapping to table.")
+        ds_count = 0
+        
+    print "DD",ds_count
+    return ds_count
 
 def get_udm_observations(engine, cycle, udm_id):
     schema_name, table_name = getObservationTable(cycle)
