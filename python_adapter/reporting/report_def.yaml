@@ -262,7 +262,7 @@ EXCEL_FORMAT:
             - seccion_infys: Secc. INFyS
             - numero_sitio: NumSit
             - numero_registro: NumReg
-            - numero_arbol: Num. Arboles
+            - numero_arbol: Num. árboles
             - familia: familia
             - nombre_cientifico: nombre_cientifico
             - condicion: condicion
@@ -297,7 +297,7 @@ EXCEL_FORMAT:
             - numero_conglomerado: ID Conglomerado
             - numero_sitio: ID Sitio
             - numero_registro: Num. de registro/tallo
-            - numero_arbol: Num. Arboles
+            - numero_arbol: Num. de árbol
             - nombre_cientifico: Nombre cientifico
             - carbono_aereo_estimado: Contenido de Carbono (tonC) 
     carbono5:

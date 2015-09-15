@@ -4,3 +4,4 @@ encoding//reporting/tables/models.py=utf-8
 encoding//reporting/tables/views.py=utf-8
 encoding//reporting/tools/datatable.py=utf-8
 encoding//reporting/tools/output_formats.py=utf-8
+encoding//reporting/tools/spatial_data.py=utf-8
